@@ -1,5 +1,5 @@
 # Mobility Wheelchair
 
-## Android codebase
+## Android and Arduino C codebase
 
-*Java*
+*Java*, *C*
