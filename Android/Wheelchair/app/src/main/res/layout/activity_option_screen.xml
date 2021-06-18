@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/white"
+        tools:context=".OptionScreenActivity">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical"
+            >
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Docking Mode"
+            android:textSize="18dp"
+            android:textColor="#808080"
+            android:textAlignment="center"
+            />
+    <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_phone_charge"
+            android:background="@color/white"
+            android:id="@+id/dockmode"
+
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+        />
+    </LinearLayout>
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+        <TextView
+                android:id="@+id/tvText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:textColor="#808080"
+                android:textSize="30dp"
+                android:text="OR" />
+
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="16dp"
+                android:layout_toLeftOf="@id/tvText"
+                android:background="#808080"
+                />
+
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="16dp"
+                android:layout_toRightOf="@id/tvText"
+                android:background="#808080"
+                />
+
+    </RelativeLayout>
+
+   <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_alignParentBottom="true"
+
+           android:orientation="vertical"
+       >
+       <TextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+           android:text="Remote Control"
+               android:textSize="18dp"
+               android:textColor="#808080"
+           android:textAlignment="center"
+           />
+       <ImageButton
+               android:textColor="#808080"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:src="@drawable/ic_joystick"
+               android:background="@color/white"
+               android:layout_marginBottom="50dp"
+               android:id="@+id/remotemode"
+               android:layout_gravity="center"
+               android:layout_marginTop="20dp"
+               />
+   </LinearLayout>
+
+</RelativeLayout>

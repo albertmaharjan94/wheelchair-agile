@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".TabActivity">
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+        android:background="#E3000000"
+        android:id="@+id/connectLay"
+            android:clickable="true"
+            android:translationZ="90dp"
+            >
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                android:layout_alignParentBottom="true"
+                >
+                <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/leftAnim"
+                        android:layout_width="match_parent"
+                        android:layout_height="500dp"
+                        app:lottie_rawRes="@raw/connect"
+                        android:layout_centerVertical="true"
+                        app:lottie_autoPlay="true"
+                        app:lottie_loop="true"/>
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                    android:id="@+id/connectTxt"
+                    android:textColor="@color/white"
+                    android:text="Connect Your Device"
+                    android:textAlignment="center"
+                    android:paddingBottom="30dp"
+                    android:textSize="20dp"
+                    />
+            </LinearLayout>
+    </RelativeLayout>
+    
+<LinearLayout
+        android:layout_width="fill_parent"
+        android:orientation="vertical"
+        android:layout_height="fill_parent"
+    >
+
+    <com.google.android.material.appbar.AppBarLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:theme="@style/Theme.WheelchairApp.AppBarOverlay">
+
+
+        <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabs"
+                android:layout_width="match_parent"
+                app:tabIndicatorColor="@color/black"
+                app:tabSelectedTextColor="#808080"
+                app:tabTextColor="@color/black"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorPrimary" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.softwarica.wheelchairapp.ViewPager.CustomViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:background="@color/white"
+            android:backgroundTint="@color/white"
+            android:layout_height="500dp"
+            />
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:backgroundTint="#E1F2FE"
+            android:layout_below="@+id/indiLay"
+            >
+
+
+        <io.ghyeok.stickyswitch.widget.StickySwitch
+                android:id="@+id/startbtn"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="30dp"
+                app:ss_animationDuration="600"
+                app:ss_iconPadding="18dp"
+                app:ss_iconSize="22dp"
+                app:ss_leftIcon="@drawable/ic_power_button"
+                app:ss_leftText="OFF"
+                app:ss_rightIcon="@drawable/ic_power"
+                app:ss_rightText="ON"
+                app:ss_selectedTextSize="14sp"
+                app:ss_sliderBackgroundColor="#84A9C0"
+                app:ss_switchColor="#4C7994"
+                app:ss_textColor="@color/black"
+                app:ss_textSize="12sp"
+                app:ss_animationType="line"/>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/startbtn"
+                android:orientation="horizontal"
+                android:layout_margin="10dp"
+                android:id="@+id/utilityLay"
+                android:visibility="gone"
+                >
+            <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_arrow_loop"
+                    android:backgroundTint="#E1F2FE"
+                    android:id="@+id/reverse"
+                    android:layout_weight="1"
+                    />
+            <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_forward"
+                    android:backgroundTint="#E1F2FE"
+                    android:visibility="gone"
+                    android:id="@+id/forward"
+                    android:layout_weight="1"
+                    />
+            <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_headlight_on"
+                    android:backgroundTint="#E1F2FE"
+                    android:id="@+id/headlights"
+                    android:layout_weight="1"
+                    />
+            <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_headlight__off"
+                    android:backgroundTint="#E1F2FE"
+                    android:id="@+id/headlights_off"
+                    android:visibility="gone"
+                    android:layout_weight="1"
+                    />
+        </LinearLayout>
+
+
+    </RelativeLayout>
+</LinearLayout>
+
+</FrameLayout>

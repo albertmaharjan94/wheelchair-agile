@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+       >
+
+    <com.google.ar.sceneform.SceneView
+            android:id="@+id/sceneView"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:visibility="gone"
+            android:background="@color/white"
+            android:backgroundTint="@color/white"
+            />
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/remotelay"
+            android:backgroundTint="@color/white"
+          android:background="@color/white"
+        android:orientation="vertical">
+
+        <io.github.controlwear.virtual.joystick.android.JoystickView
+                android:id="@+id/jsFirst"
+                xmlns:custom="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                custom:JV_buttonColor="#FF6E40"
+                custom:JV_buttonSizeRatio="35%"
+                custom:JV_borderWidth="4dp"
+                custom:JV_fixedCenter="true"
+                android:background="@drawable/space"
+                custom:JV_buttonImage="@drawable/moon2"
+                 />
+
+        <TextView
+                android:id="@+id/txtLog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14dp"
+                android:textColor="@color/black"
+                />
+    </LinearLayout>
+    <LinearLayout
+            android:layout_below="@+id/sceneView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:id="@+id/indiLay"
+            android:background="@color/white"
+            >
+        <LinearLayout
+                android:layout_weight="1"
+                android:padding="10dp"                    android:layout_gravity="center"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_speedometer"
+                    android:layout_marginRight="20dp"
+                    />
+            <com.robinhood.ticker.TickerView
+                    app:ticker_defaultPreferredScrollingDirection="down"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:ticker_animationDuration="1500"
+                    android:text="4 km/hr"
+                    android:layout_gravity="center"
+
+                    android:textSize="15dp"
+                    android:id="@+id/speedtxt"
+                    android:textColor="@color/black"
+                    />
+        </LinearLayout>
+        <LinearLayout
+                android:padding="10dp"
+                android:layout_weight="1"
+                android:background="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_disability"
+                    android:layout_marginRight="20dp"
+                    />
+            <com.robinhood.ticker.TickerView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="4 km/hr"
+                    android:id="@+id/distancetxt"
+                    android:textSize="15dp"
+                    android:layout_gravity="center"
+
+                    android:textColor="@color/black"
+                    />
+
+        </LinearLayout>
+        <LinearLayout
+                android:padding="10dp"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@color/white"
+                >
+            <eo.view.batterymeter.BatteryMeterView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+
+                    app:batteryMeterChargeLevel="80"
+                    app:batteryMeterChargingColor="#4caf50"
+                    app:batteryMeterColor="#0277bd"
+                    app:batteryMeterCriticalChargeLevel="15"
+                    app:batteryMeterCriticalColor="#d84315"
+                    app:batteryMeterIndicatorColor="@android:color/transparent"
+                    app:batteryMeterIsCharging="true"
+                    app:batteryMeterTheme="rounded"
+                    android:rotation="90"
+                    app:batteryMeterUnknownColor="#e0e0e0"
+                    />
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="50%"
+                    android:textSize="15dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="20dp"
+                    android:textColor="@color/black"
+                    />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
