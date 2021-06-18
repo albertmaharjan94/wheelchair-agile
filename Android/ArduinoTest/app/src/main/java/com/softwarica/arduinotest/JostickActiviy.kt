@@ -20,7 +20,7 @@ class JostickActiviy : AppCompatActivity() {
         jsFirst = findViewById(R.id.jsFirst)
         txtLog = findViewById(R.id.txtLog)
         jsFirst.setOnMoveListener(OnMoveListener { angle, strength ->
-            val res = degreeToSpeed(angle, strength, safe_degree = 10, safe_strength = 15)
+            val res = degreeToSpeed(angle, strength, safe_degree = 10)
             Log.d("Test", res.toString())
             txtLog.text = "$res"
         })
@@ -34,33 +34,22 @@ class JostickActiviy : AppCompatActivity() {
         num: Float,
         max: Float,
         sort: Int = 1,
-        safe_degree: Int = 0,
-        safe_strength: Int = 15
+        safe_degree: Int = 0
     ): Float {
         return if (sort == 1) {
-            val res = reMap(num, 0F + safe_degree, 90F, max, 0F - safe_strength)
+            val res = reMap(num, 0F + safe_degree, 90F - safe_degree, max, 0F)
             if (res < 0) 0F else res
         } else {
-            val res = reMap(num, 0F + safe_degree, 90F, 0F, max)
+            val res = reMap(num, 0F + safe_degree, 90F - safe_degree, 0F, max)
             if (res < 0) 0F else res
 
         }
     }
 
-    private fun convertToDefaultStrength(
-        num: Int,
-        max: Int,
-        sort: Int = 1,
-        safe_strength: Int = 15
-    ): Int {
-        return reMap(num.toFloat(), 0F + safe_strength, max.toFloat(), 0F, max.toFloat()).toInt()
-    }
-
     private fun degreeToSpeed(
         degree: Int,
         strength: Int,
-        safe_degree: Int = 5,
-        safe_strength: Int = 15
+        safe_degree: Int = 5
     ): List<Int> {
         var leftState = 1
         var rightState = 1
@@ -68,28 +57,18 @@ class JostickActiviy : AppCompatActivity() {
         var rightSpeed = 0
         var str = strength
         when {
-            str <= safe_strength -> {
-                leftState = 1
-                leftSpeed = 0
-                rightState = 1
-                rightSpeed = 0
-            }
             degree in 0..180 + safe_degree || degree in 360 - safe_degree..360 -> {
                 when {
                     degree in 90 - safe_degree..90 + safe_degree -> {
-                        leftSpeed =
-                            convertToDefaultStrength(str, 100, safe_strength = safe_strength)
-                        rightSpeed =
-                            convertToDefaultStrength(str, 100, safe_strength = safe_strength)
+                        leftSpeed = str
+                        rightSpeed = str
                     }
                     degree in 180 - safe_degree..180 + safe_degree -> {
                         leftSpeed = 0
-                        rightSpeed =
-                            convertToDefaultStrength(str, 100, safe_strength = safe_strength)
+                        rightSpeed = str
                     }
                     degree in 0..0 + safe_degree || degree in 360 - safe_degree..360 -> {
-                        leftSpeed =
-                            convertToDefaultStrength(str, 100, safe_strength = safe_strength)
+                        leftSpeed = str
                         rightSpeed = 0
                     }
                     degree < 90 -> {
@@ -107,8 +86,7 @@ class JostickActiviy : AppCompatActivity() {
                             0,
                             safe_degree = safe_degree
                         ).roundToInt()
-                        rightSpeed =
-                            convertToDefaultStrength(str, 100, safe_strength = safe_strength)
+                        rightSpeed = str
                     }
                 }
             }
@@ -117,10 +95,8 @@ class JostickActiviy : AppCompatActivity() {
                 rightState = 0
                 when {
                     degree in 270 - safe_degree..270 + safe_degree -> {
-                        leftSpeed =
-                            convertToDefaultStrength(str, 100, safe_strength = safe_strength)
-                        rightSpeed =
-                            convertToDefaultStrength(str, 100, safe_strength = safe_strength)
+                        leftSpeed = str
+                        rightSpeed = str
                     }
                     degree < 270 -> {
                         leftSpeed = convertToStrength(
@@ -128,12 +104,10 @@ class JostickActiviy : AppCompatActivity() {
                             str.toFloat(),
                             safe_degree = safe_degree
                         ).roundToInt()
-                        rightSpeed =
-                            convertToDefaultStrength(str, 100, safe_strength = safe_strength)
+                        rightSpeed = str
                     }
                     else -> {
-                        leftSpeed =
-                            convertToDefaultStrength(str, 100, safe_strength = safe_strength)
+                        leftSpeed = str
                         rightSpeed = convertToStrength(
                             abs(degree - 360).toFloat(),
                             str.toFloat(),

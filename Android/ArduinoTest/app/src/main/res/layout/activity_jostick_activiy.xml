@@ -14,7 +14,7 @@
         custom:JV_buttonColor="#FF6E40"
         custom:JV_buttonSizeRatio="15%"
         custom:JV_borderWidth="4dp"
-        custom:JV_autoReCenterButton="false"
+        custom:JV_fixedCenter="true"
         android:background="@drawable/space"
         custom:JV_buttonImage="@drawable/moon2"
         app:layout_constraintBottom_toBottomOf="parent"
