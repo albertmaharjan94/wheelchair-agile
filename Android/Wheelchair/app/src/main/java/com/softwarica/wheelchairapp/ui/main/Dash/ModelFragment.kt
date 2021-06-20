@@ -60,7 +60,7 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
     var wheelchair : Node = Node().apply {
         localRotation = getRotationQuaternion(1f)
         localPosition = Vector3(0f, -3f, -7f)
-        localScale = Vector3(6f, 6f, 6f)
+        localScale = Vector3(176f, 176f, 176f)
         name = "Wheelchair"
 
     }
@@ -117,7 +117,7 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
             remotelay.visibility  =View.VISIBLE
         }
 
-        renderObj(Uri.parse("scene.sfb"))
+        renderObj(Uri.parse("wheelchair.sfb"))
 
 
         mDetector = GestureDetectorCompat(requireContext(), FlingGestureDetector())

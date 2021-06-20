@@ -63,17 +63,20 @@ dependencies {
     def lottieVersion = "3.4.0"
     implementation "com.airbnb.android:lottie:$lottieVersion"
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
+
 }
 
 apply plugin: 'com.google.ar.sceneform.plugin'
 
 
-sceneform.asset('sampledata/wheelchair.obj', // 'Source Asset Path' specified during import.
-        'default',                    // 'Material Path' specified during import.
-        'sampledata/wheelchair.sfa', // '.sfa Output Path' specified during import.
-        'src/main/assets/wheelchair')      // '.sfb Output Path' specified during import.
 
 sceneform.asset('sampledata/scene.gltf', // 'Source Asset Path' specified during import.
         'default',                    // 'Material Path' specified during import.
         'sampledata/scene.sfa', // '.sfa Output Path' specified during import.
         'src/main/assets/scene')      // '.sfb Output Path' specified during import.
+
+
+sceneform.asset('sampledata/wheelchair.fbx', // 'Source Asset Path' specified during import.
+        'default',                    // 'Material Path' specified during import.
+        'sampledata/wheelchair.sfa', // '.sfa Output Path' specified during import.
+        'src/main/assets/wheelchair')      // '.sfb Output Path' specified during import.

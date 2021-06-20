@@ -1,95 +1,1439 @@
 {
+  animations: [
+    {
+      path: 'sampledata/wheelchair.fbx',
+    },
+  ],
   materials: [
     {
-      name: 'Mat_riau__35',
+      name: 'Material_83',
       parameters: [
         {
-          baseColor: null,
-        },
-        {
-          baseColorTint: [
-            0.58799999999999997,
-            0.58799999999999997,
-            0.58799999999999997,
+          baseColor: [
+            1,
+            1,
+            1,
             1,
           ],
         },
         {
-          metallic: 1,
+          baseColorMap: '183',
         },
         {
-          roughness: 0.408248,
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
         },
         {
           opacity: null,
         },
       ],
-      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
     },
     {
-      name: 'Mat_riau__36',
+      name: 'Material_85',
       parameters: [
         {
-          baseColor: null,
-        },
-        {
-          baseColorTint: [
-            0.58799999999999997,
-            0.58799999999999997,
-            0.58799999999999997,
+          baseColor: [
+            1,
+            1,
+            1,
             1,
           ],
         },
         {
-          metallic: 1,
+          baseColorMap: '203',
         },
         {
-          roughness: 0.408248,
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
         },
         {
           opacity: null,
         },
       ],
-      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
     },
     {
-      name: 'Mat_riau__37',
+      name: 'Material_87',
       parameters: [
         {
-          baseColor: null,
-        },
-        {
-          baseColorTint: [
-            0.58799999999999997,
-            0.58799999999999997,
-            0.58799999999999997,
+          baseColor: [
+            1,
+            1,
+            1,
             1,
           ],
         },
         {
-          metallic: 1,
+          baseColorMap: '223',
         },
         {
-          roughness: 0.408248,
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
         },
         {
           opacity: null,
         },
       ],
-      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_89',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '176',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_91',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '185',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_105',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '183',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_107',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '166',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_109',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '167',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_111',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '197',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_113',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_115',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '244',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_141',
+      parameters: [
+        {
+          baseColor: [
+            0.49803900000000001,
+            0.49803900000000001,
+            0.49803900000000001,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_145',
+      parameters: [
+        {
+          baseColor: [
+            0,
+            0,
+            0,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_224',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '7',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_225',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '7',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_226',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '7',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_227',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '7',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_228',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '7',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_49',
+      parameters: [
+        {
+          baseColor: [
+            0.25097999999999998,
+            0.28235300000000002,
+            0.80000000000000004,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_51',
+      parameters: [
+        {
+          baseColor: [
+            0.25097999999999998,
+            0.28235300000000002,
+            0.80000000000000004,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_53',
+      parameters: [
+        {
+          baseColor: [
+            0.25097999999999998,
+            0.28235300000000002,
+            0.80000000000000004,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_55',
+      parameters: [
+        {
+          baseColor: [
+            0.25097999999999998,
+            0.28235300000000002,
+            0.80000000000000004,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_57',
+      parameters: [
+        {
+          baseColor: [
+            0.25097999999999998,
+            0.28235300000000002,
+            0.80000000000000004,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_59',
+      parameters: [
+        {
+          baseColor: [
+            0.25097999999999998,
+            0.28235300000000002,
+            0.80000000000000004,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_61',
+      parameters: [
+        {
+          baseColor: [
+            0.25097999999999998,
+            0.28235300000000002,
+            0.80000000000000004,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_65',
+      parameters: [
+        {
+          baseColor: [
+            0.25097999999999998,
+            0.28235300000000002,
+            0.80000000000000004,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_67',
+      parameters: [
+        {
+          baseColor: [
+            0.25097999999999998,
+            0.28235300000000002,
+            0.80000000000000004,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_75',
+      parameters: [
+        {
+          baseColor: [
+            0.25097999999999998,
+            0.28235300000000002,
+            0.80000000000000004,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_79',
+      parameters: [
+        {
+          baseColor: [
+            0.25097999999999998,
+            0.28235300000000002,
+            0.80000000000000004,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_81',
+      parameters: [
+        {
+          baseColor: [
+            0.25097999999999998,
+            0.28235300000000002,
+            0.80000000000000004,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_327',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '1190',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_95',
+      parameters: [
+        {
+          baseColor: [
+            0.25097999999999998,
+            0.28235300000000002,
+            0.80000000000000004,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_329',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '1199',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Material_331',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: '1206',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
     },
   ],
   model: {
     attributes: [
       'Position',
+      'Color',
       'TexCoord',
       'Orientation',
+      'BoneIndices',
+      'BoneWeights',
     ],
     collision: {},
-    file: 'sampledata/wheelchair.obj',
+    file: 'sampledata/wheelchair.fbx',
     name: 'wheelchair',
     recenter: 'root',
-    scale: 0.033190999999999998,
+    scale: 7.0609900000000003,
   },
+  samplers: [
+    {
+      file: 'sampledata\\wheelchair.fbm\\176.png',
+      name: '176',
+      pipeline_name: 'wheelchair.fbm\\176.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\183.png',
+      name: '183',
+      pipeline_name: 'wheelchair.fbm\\183.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\193.png',
+      name: '193',
+      pipeline_name: 'wheelchair.fbm\\193.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\197.png',
+      name: '197',
+      pipeline_name: 'wheelchair.fbm\\197.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\166.png',
+      name: '166',
+      pipeline_name: 'wheelchair.fbm\\166.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\203.png',
+      name: '203',
+      pipeline_name: 'wheelchair.fbm\\203.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\215.png',
+      name: '215',
+      pipeline_name: 'wheelchair.fbm\\215.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\223.png',
+      name: '223',
+      pipeline_name: 'wheelchair.fbm\\223.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\185.png',
+      name: '185',
+      pipeline_name: 'wheelchair.fbm\\185.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\170.png',
+      name: '170',
+      pipeline_name: 'wheelchair.fbm\\170.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\178.png',
+      name: '178',
+      pipeline_name: 'wheelchair.fbm\\178.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\8.png',
+      name: '8',
+      pipeline_name: 'wheelchair.fbm\\8.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\167.png',
+      name: '167',
+      pipeline_name: 'wheelchair.fbm\\167.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\180.png',
+      name: '180',
+      pipeline_name: 'wheelchair.fbm\\180.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\208.png',
+      name: '208',
+      pipeline_name: 'wheelchair.fbm\\208.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\230.png',
+      name: '230',
+      pipeline_name: 'wheelchair.fbm\\230.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\244.png',
+      name: '244',
+      pipeline_name: 'wheelchair.fbm\\244.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\248.png',
+      name: '248',
+      pipeline_name: 'wheelchair.fbm\\248.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\190.png',
+      name: '190',
+      pipeline_name: 'wheelchair.fbm\\190.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\7.png',
+      name: '7',
+      pipeline_name: 'wheelchair.fbm\\7.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\1190.png',
+      name: '1190',
+      pipeline_name: 'wheelchair.fbm\\1190.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\1194.png',
+      name: '1194',
+      pipeline_name: 'wheelchair.fbm\\1194.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\1199.png',
+      name: '1199',
+      pipeline_name: 'wheelchair.fbm\\1199.png',
+    },
+    {
+      file: 'sampledata\\wheelchair.fbm\\1206.png',
+      name: '1206',
+      pipeline_name: 'wheelchair.fbm\\1206.png',
+    },
+  ],
   version: '0.54:2',
 }

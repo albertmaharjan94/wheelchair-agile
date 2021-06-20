@@ -12,6 +12,7 @@
         android:background="#E3000000"
         android:id="@+id/connectLay"
             android:clickable="true"
+            android:visibility="gone"
             android:translationZ="90dp"
             >
             <LinearLayout
@@ -32,6 +33,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                     android:id="@+id/connectTxt"
+                        android:fontFamily="@font/lato"
                     android:textColor="@color/white"
                     android:text="Connect Your Device"
                     android:textAlignment="center"
@@ -79,12 +81,23 @@
             android:layout_below="@+id/indiLay"
             >
 
-
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="Not Connected"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/lato"
+                android:textColor="@color/black"
+                android:id="@+id/connTxt"
+                android:layout_marginBottom="20dp"
+                />
         <io.ghyeok.stickyswitch.widget.StickySwitch
                 android:id="@+id/startbtn"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/connTxt"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="30dp"
                 app:ss_animationDuration="600"
