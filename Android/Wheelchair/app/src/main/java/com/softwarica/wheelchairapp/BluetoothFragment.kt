@@ -207,7 +207,7 @@ companion object{
         class CreateConnectionThread(private val context: Context , address: String)  : Thread() {
         var bluetoothDevice: BluetoothDevice = mBluetoothAdapter.getRemoteDevice(address)
         var tmp: BluetoothSocket? = null
-        var uuid: UUID = bluetoothDevice.getUuids().get(0).getUuid()
+        var uuid: UUID = bluetoothDevice.uuids[0].uuid
 
 
          init {
@@ -221,6 +221,7 @@ companion object{
                  tmp = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid);
 
              } catch (e: IOException) {
+                 print(e.printStackTrace())
              }
 
              mmSocket = tmp;

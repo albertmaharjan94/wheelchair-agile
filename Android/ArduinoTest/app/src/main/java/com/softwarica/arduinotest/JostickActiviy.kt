@@ -56,6 +56,7 @@ class JostickActiviy : AppCompatActivity() {
         var leftSpeed = 0
         var rightSpeed = 0
         var str = strength
+
         when {
             degree in 0..180 + safe_degree || degree in 360 - safe_degree..360 -> {
                 when {

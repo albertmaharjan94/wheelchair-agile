@@ -29,7 +29,6 @@ class TabActivity : AppCompatActivity() {
     private lateinit var connectLay : RelativeLayout;
     private  lateinit var utilityLay : LinearLayout;
     private lateinit var conntxt : TextView
-    private var connectedThread : ConnectedThread ?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -138,6 +137,7 @@ class TabActivity : AppCompatActivity() {
     }
 
 
+
     fun changeState(mode: String){
         when(mode){
             "FWD" -> {
@@ -193,41 +193,43 @@ class TabActivity : AppCompatActivity() {
 
         var handler: Handler? = null;
 
+        var connectedThread : ConnectedThread ?= null
+
         /* =============================== Thread for Data Transfer =========================================== */
         class ConnectedThread(private val mmSocket: BluetoothSocket) : Thread() {
             private val mmInStream: InputStream?
             private val mmOutStream: OutputStream?
             override fun run() {
-                val buffer = ByteArray(1024) // buffer store for the stream
-                var bytes = 0 // bytes returned from read()
-                // Keep listening to the InputStream until an exception occurs
-                while (true) {
-                    try {
-                        /*
-                        Read from the InputStream from Arduino until termination character is reached.
-                        Then send the whole String message to GUI Handler.
-                         */
-                        buffer[bytes] = mmInStream?.read() as Byte
-                        var readMessage: String
-                        if (buffer[bytes].equals("\n")) {
-                            readMessage = String(buffer, 0, bytes)
-                            Log.e("Arduino Message", readMessage)
-                            handler?.obtainMessage(MESSAGE_READ, readMessage)?.sendToTarget()
-                            bytes = 0
-                        } else {
-                            bytes++
-                        }
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                        break
-                    }
-                }
+//                val buffer = ByteArray(1024) // buffer store for the stream
+//                var bytes = 0 // bytes returned from read()
+//                // Keep listening to the InputStream until an exception occurs
+//                while (true) {
+//                    try {
+//                        /*
+//                        Read from the InputStream from Arduino until termination character is reached.
+//                        Then send the whole String message to GUI Handler.
+//                         */
+//                        buffer[bytes] = mmInStream?.read() as Byte
+//                        var readMessage: String
+//                        if (buffer[bytes].equals("\n")) {
+//                            readMessage = String(buffer, 0, bytes)
+//                            Log.e("Arduino Message", readMessage)
+//                            handler?.obtainMessage(MESSAGE_READ, readMessage)?.sendToTarget()
+//                            bytes = 0
+//                        } else {
+//                            bytes++
+//                        }
+//                    } catch (e: IOException) {
+//                        e.printStackTrace()
+//                        break
+//                    }
+//                }
             }
 
             /* Call this from the main activity to send data to the remote device */
             fun write(input: String) {
-                val bytes = input.toByteArray() //converts entered String into bytes
                 try {
+                    val bytes = input.toByteArray() //converts entered String into bytes
                     mmOutStream?.write(bytes)
                 } catch (e: IOException) {
                     Log.e("Send Error", "Unable to send message", e)
