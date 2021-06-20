@@ -104,8 +104,8 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
             val res = degreeToSpeed(angle, strength, safe_degree = 10)
             try{
                 val ct = TabActivity.connectedThread
-                Log.d("Test", "${res.elementAtOrNull(1)}#${res.elementAt(3)}\n")
-                ct!!.write("${res.elementAtOrNull(1)}#${res.elementAt(3)}\n")
+                Log.d("Test", "${res.elementAtOrNull(0)}#${res.elementAt(1)}\n")
+                ct!!.write("${res.elementAtOrNull(0)}#${res.elementAt(1)}\n")
             }catch (e: Exception){
                 print(e.stackTrace)
             }
@@ -161,8 +161,6 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
         strength: Int,
         safe_degree: Int = 5
     ): List<Int> {
-        var leftState = 1
-        var rightState = 1
         var leftSpeed = 0
         var rightSpeed = 0
         var str = strength
@@ -201,8 +199,6 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
                 }
             }
             else -> {
-                leftState = 0
-                rightState = 0
                 when {
                     degree in 270 - safe_degree..270 + safe_degree -> {
                         leftSpeed = str
@@ -226,9 +222,12 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
                         ).roundToInt()
                     }
                 }
+
+                leftSpeed = - abs(leftSpeed)
+                rightSpeed = - abs(rightSpeed)
             }
         }
-        return listOf<Int>(leftState, leftSpeed, rightState, rightSpeed)
+        return listOf<Int>(leftSpeed, rightSpeed)
     }
 
     private fun renderObj(parse: Uri){
