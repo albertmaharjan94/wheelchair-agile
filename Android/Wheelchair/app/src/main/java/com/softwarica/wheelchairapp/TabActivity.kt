@@ -21,10 +21,7 @@ class TabActivity : AppCompatActivity() {
     private lateinit var headlights_off : ImageButton;
     private lateinit var connectLay : RelativeLayout;
     private  lateinit var utilityLay : LinearLayout;
-<<<<<<< HEAD
-=======
     private lateinit var conntxt : TextView
->>>>>>> 136efdd (dpad with serial)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,8 +85,11 @@ class TabActivity : AppCompatActivity() {
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     fun changeState(mode : String){
 =======
+=======
+>>>>>>> 136efdd (dpad with serial)
     fun changeState(mode: String){
 >>>>>>> 136efdd (dpad with serial)
         when(mode){
