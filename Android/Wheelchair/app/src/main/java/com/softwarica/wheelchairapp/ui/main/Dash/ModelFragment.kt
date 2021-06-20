@@ -24,9 +24,11 @@ import com.google.ar.sceneform.rendering.ModelRenderable
 import com.robinhood.ticker.TickerUtils
 import com.robinhood.ticker.TickerView
 import com.softwarica.wheelchairapp.R
+import com.softwarica.wheelchairapp.TabActivity
 import com.softwarica.wheelchairapp.Utils.Constants
 import io.ghyeok.stickyswitch.widget.StickySwitch
 import io.github.controlwear.virtual.joystick.android.JoystickView
+import java.lang.Exception
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -100,7 +102,14 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
         txtLog = view.findViewById(R.id.txtLog)
         jsFirst.setOnMoveListener(JoystickView.OnMoveListener { angle, strength ->
             val res = degreeToSpeed(angle, strength, safe_degree = 10)
-            Log.d("Test", res.toString())
+            try{
+                val ct = TabActivity.connectedThread
+                Log.d("Test", "${res.elementAtOrNull(1)}#${res.elementAt(3)}\n")
+                ct!!.write("${res.elementAtOrNull(1)}#${res.elementAt(3)}\n")
+            }catch (e: Exception){
+                print(e.stackTrace)
+            }
+
             txtLog.text = "$res"
         })
 
