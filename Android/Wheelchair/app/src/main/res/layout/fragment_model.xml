@@ -22,6 +22,7 @@
             android:id="@+id/remotelay"
             android:backgroundTint="@color/white"
           android:background="@color/white"
+            android:gravity="center"
         android:orientation="vertical">
 
         <io.github.controlwear.virtual.joystick.android.JoystickView

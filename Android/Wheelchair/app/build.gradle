@@ -64,6 +64,8 @@ dependencies {
     implementation "com.airbnb.android:lottie:$lottieVersion"
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
 
+    implementation 'com.github.felHR85:UsbSerial:6.1.0'
+
 }
 
 apply plugin: 'com.google.ar.sceneform.plugin'

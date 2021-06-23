@@ -25,13 +25,13 @@ class OptionScreenActivity : AppCompatActivity() {
 
         val bluetoothDialog = BluetoothFragment()
 
-        dockbtn.setOnClickListener({
+        dockbtn.setOnClickListener {
             var intent: Intent = Intent(this, TabActivity::class.java)
             intent.putExtra(Constants.MODE, Constants.DOCK)
             startActivity(intent)
-        })
+        }
 
-        remotebtn.setOnClickListener({
+        remotebtn.setOnClickListener {
             if (isBluetoothConnected()) {
                 var intent = Intent(this, TabActivity::class.java)
                 intent.putExtra(Constants.MODE, Constants.REMOTE)
@@ -39,7 +39,7 @@ class OptionScreenActivity : AppCompatActivity() {
             } else {
                 bluetoothDialog.show(supportFragmentManager, "BluetoothDialogFragment")
             }
-        })
+        }
 
     }
 

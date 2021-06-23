@@ -1,11 +1,8 @@
 package com.softwarica.wheelchairapp
 
 import android.bluetooth.BluetoothSocket
-import android.content.Intent
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
+import android.content.*
+import android.os.*
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -14,10 +11,12 @@ import com.google.android.material.tabs.TabLayout
 import com.softwarica.wheelchairapp.Utils.Constants
 import com.softwarica.wheelchairapp.ViewPager.CustomViewPager
 import com.softwarica.wheelchairapp.ui.main.SectionsPagerAdapter
+import com.softwarica.wheelchairapp.services.UsbService
 import io.ghyeok.stickyswitch.widget.StickySwitch
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.lang.Exception
 
 
 class TabActivity : AppCompatActivity() {
@@ -29,16 +28,81 @@ class TabActivity : AppCompatActivity() {
     private lateinit var connectLay : RelativeLayout;
     private  lateinit var utilityLay : LinearLayout;
     private lateinit var conntxt : TextView
+    private lateinit var txtDebugger : TextView
+
+    var mode: String? = null
+
+    private var usbService: UsbService? = null
+    private val uHandler = UsbHandler(this)
+
+    private val usbConnection: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(arg0: ComponentName, arg1: IBinder) {
+            usbService = (arg1 as UsbService.UsbBinder).service
+            usbService!!.setHandler(uHandler)
+        }
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            usbService = null
+        }
+    }
+
+    private val mUsbReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            // default no usb connection
+            when (intent.action) {
+                UsbService.ACTION_USB_PERMISSION_GRANTED ->{
+                    USB_STATE = 1
+                    conntxt.text = "USB Connected"
+//                "USB Permission connected"
+                }
+                UsbService.ACTION_USB_PERMISSION_NOT_GRANTED ->{
+                    conntxt.text = "USB Permission not granted"
+                    USB_STATE = 2
+//                   "USB Permission not granted"
+                }
+                UsbService.ACTION_NO_USB ->{
+                    USB_STATE = 3
+                    conntxt.text = "No USB connected"
+//                    "No USB connected"
+                }
+                UsbService.ACTION_USB_DISCONNECTED ->{
+                    conntxt.text = "USB disconnected"
+                    USB_STATE = 4
+//                    "USB disconnected"
+                }
+                UsbService.ACTION_USB_NOT_SUPPORTED ->
+                    USB_STATE = 5
+//                   "USB device not supported"
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if(mode == Constants.DOCK){
+            setFilters() // Start listening notifications from UsbService
+
+            startService(
+                UsbService::class.java,
+                usbConnection,
+                null
+            )
+        }
+    }
+
+    override fun onPause(){
+        super.onPause()
+        if(mode == Constants.DOCK){
+            unregisterReceiver(mUsbReceiver)
+            unbindService(usbConnection)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tab)
-
-        val mode = intent.getStringExtra(Constants.MODE)
-        val bt_status = intent.getBooleanExtra(Constants.BT_STATUS, false);
-
-
-
+        mode = intent.getStringExtra(Constants.MODE)
+        val bt_status = intent.getBooleanExtra(Constants.BT_STATUS, false)
 
         val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager, mode!!)
         val viewPager: CustomViewPager = findViewById(R.id.view_pager)
@@ -55,8 +119,12 @@ class TabActivity : AppCompatActivity() {
         headlights = findViewById(R.id.headlights)
         headlights_off = findViewById(R.id.headlights_off)
         conntxt = findViewById(R.id.connTxt)
-        connectLay = findViewById(R.id.connectLay);
+        txtDebugger = findViewById(R.id.txtDebugger)
+        connectLay = findViewById(R.id.connectLay)
 
+//        if(!Constants.DEBUG){
+//            txtDebugger.visibility = View.GONE
+//        }
         startbtn = findViewById(R.id.startbtn)
         startbtn.setOnClickListener {
             Log.d("TAG", "onCreate: " + startbtn.getDirection())
@@ -67,7 +135,7 @@ class TabActivity : AppCompatActivity() {
             }
 
         }
-
+        txtDebugger.text = mode
         if(mode == Constants.REMOTE){
             handler = object : Handler(Looper.getMainLooper()) {
                 override fun handleMessage(msg: Message) {
@@ -106,37 +174,66 @@ class TabActivity : AppCompatActivity() {
             Log.d("TAG", "onCreate: " + bt_status)
 
             if(bt_status){
-                handler?.obtainMessage(CONNECTING_STATUS, 1, -1)?.sendToTarget();
+                handler?.obtainMessage(CONNECTING_STATUS, 1, -1)?.sendToTarget()
                 connectedThread = ConnectedThread(BluetoothFragment.mmSocket!!)
                     connectedThread?.start()
             }
 
-
-
-
         }else if(mode == Constants.DOCK){
-            checkConnection()
+            startService(
+                UsbService::class.java,
+                usbConnection,
+                null
+            )
         }
 
-        reverse.setOnClickListener({
+        reverse.setOnClickListener {
             changeState("REV")
-        })
-        forward.setOnClickListener({
+        }
+        forward.setOnClickListener {
             changeState("FWD")
-        })
-        headlights.setOnClickListener({
+        }
+        headlights.setOnClickListener {
             changeState("HDON")
-        })
-        headlights_off.setOnClickListener({
+        }
+        headlights_off.setOnClickListener {
             changeState("HOFF")
-        })
+        }
     }
 
     fun checkConnection(){
 
     }
 
+    private fun setFilters() {
+        val filter = IntentFilter()
+        filter.addAction(UsbService.ACTION_USB_PERMISSION_GRANTED)
+        filter.addAction(UsbService.ACTION_NO_USB)
+        filter.addAction(UsbService.ACTION_USB_DISCONNECTED)
+        filter.addAction(UsbService.ACTION_USB_NOT_SUPPORTED)
+        filter.addAction(UsbService.ACTION_USB_PERMISSION_NOT_GRANTED)
+        registerReceiver(mUsbReceiver, filter)
+    }
 
+    private fun startService(
+        service: Class<*>,
+        serviceConnection: ServiceConnection,
+        extras: Bundle?
+    ) {
+        if (!UsbService.SERVICE_CONNECTED) {
+            val startService = Intent(this, service)
+            if (extras != null && !extras.isEmpty) {
+                val keys = extras.keySet()
+                for (key in keys) {
+                    val extra = extras.getString(key)
+                    startService.putExtra(key, extra)
+                }
+            }
+            startService(startService)
+        }
+        val bindingIntent = Intent(this, service)
+        bindService(bindingIntent, serviceConnection, BIND_AUTO_CREATE)
+    }
 
     fun changeState(mode: String){
         when(mode){
@@ -161,10 +258,16 @@ class TabActivity : AppCompatActivity() {
     }
 
     fun wheelChairStart () {
+        if(mode == Constants.DOCK){
+            usbService?.write("1#0#0#0\n".toByteArray())
+        }
         utilityLay.visibility = View.VISIBLE
     }
 
     fun wheelChairStop(){
+        if(mode == Constants.DOCK){
+            usbService?.write("0#0#0#0\n".toByteArray())
+        }
         utilityLay.visibility = View.GONE
         forward.visibility = View.GONE
         headlights_off.visibility = View.GONE
@@ -184,10 +287,46 @@ class TabActivity : AppCompatActivity() {
         startActivity(a)
     }
 
+
+    private class UsbHandler(val activity: TabActivity) : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            when (msg.what) {
+                UsbService.MESSAGE_FROM_SERIAL_PORT -> {
+                    try{
+                        activity.runOnUiThread{
+                            val data = msg.obj.toString()
+                        }
+                    }catch (e: Exception){
+                        e.printStackTrace()
+                    }
+                }
+                UsbService.CTS_CHANGE -> Toast.makeText(
+                    activity,
+                    "CTS_CHANGE",
+                    Toast.LENGTH_LONG
+                ).show()
+                UsbService.DSR_CHANGE -> Toast.makeText(
+                    activity,
+                    "DSR_CHANGE",
+                    Toast.LENGTH_LONG
+                ).show()
+                UsbService.SYNC_READ -> {
+                    val buffer = msg.obj as List<String>
+                    val stats = "${buffer[0].trim()} ${buffer[1].trim()} ${buffer[2].trim()} ${buffer[3].trim()}"
+                    activity.txtDebugger.text = stats
+                }
+            }
+        }
+
+    }
+
+
     companion object{
 
          const val CONNECTING_STATUS =
             1 // used in bluetooth handler to identify message status
+
+        var USB_STATE = 3
 
          const val MESSAGE_READ = 2 // used in bluetooth handler to identify message update
 
