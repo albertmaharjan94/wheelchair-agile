@@ -18,17 +18,23 @@ class OptionScreenActivity : AppCompatActivity() {
         remotebtn = findViewById(R.id.remotemode)
         dockbtn = findViewById(R.id.dockmode)
 
-        dockbtn.setOnClickListener({
-            var intent : Intent = Intent(this, TabActivity::class.java)
+        val bluetoothDialog = BluetoothFragment()
+
+        dockbtn.setOnClickListener {
+            var intent: Intent = Intent(this, TabActivity::class.java)
             intent.putExtra(Constants.MODE, Constants.DOCK)
             startActivity(intent)
-        })
+        }
 
-        remotebtn.setOnClickListener({
-            var intent : Intent = Intent(this, TabActivity::class.java)
-            intent.putExtra(Constants.MODE, Constants.REMOTE)
-            startActivity(intent)
-        })
+        remotebtn.setOnClickListener {
+            if (isBluetoothConnected()) {
+                var intent = Intent(this, TabActivity::class.java)
+                intent.putExtra(Constants.MODE, Constants.REMOTE)
+                startActivity(intent)
+            } else {
+                bluetoothDialog.show(supportFragmentManager, "BluetoothDialogFragment")
+            }
+        }
 
     }
 }

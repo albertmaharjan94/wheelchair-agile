@@ -2,6 +2,9 @@ package com.softwarica.wheelchairapp.ui.main.Dash
 
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.util.Log
 import android.view.*
 import android.widget.LinearLayout
@@ -57,6 +60,8 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
 
     private lateinit var jsFirst: JoystickView
     private lateinit var txtLog: TextView
+
+
 
     lateinit var scene : Scene
     var wheelchair : Node = Node().apply {
@@ -365,4 +370,6 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
             }
         }
     }
+
+
 }
