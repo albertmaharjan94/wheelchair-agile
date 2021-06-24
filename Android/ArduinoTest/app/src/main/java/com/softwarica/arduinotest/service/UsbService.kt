@@ -15,9 +15,11 @@ import android.os.IBinder
 import android.util.Log
 import com.felhr.usbserial.*
 import okio.Buffer
+import java.io.UnsupportedEncodingException
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
 import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import java.util.*
 
 
@@ -85,6 +87,30 @@ class UsbService : Service() {
      * onCreate will be executed when service is started. It configures an IntentFilter to listen for
      * incoming Intents (USB ATTACHED, USB DETACHED...) and it tries to open a serial port.
      */
+    private val mCallback =
+        UsbSerialInterface.UsbReadCallback { arg0 ->
+            try {
+                val data = String(arg0, StandardCharsets.UTF_8)
+                data2 += data
+                if (data2.isNotEmpty()) {
+                    val split = data2.split("#");
+
+                    if (split.isNotEmpty()) {
+                        val commaSplit = split[split.size - 1].split(",")
+
+                        if (commaSplit.size > 5 && mHandler != null) {
+                            mHandler!!.obtainMessage(SYNC_READ, commaSplit).sendToTarget()
+                        }
+
+                        if (split.size > 10) {
+                            data2 = ""
+                        }
+                    }
+                }
+            } catch (e: UnsupportedEncodingException) {
+                e.printStackTrace()
+            }
+        }
     override fun onCreate() {
         context = this
         serialPortConnected = false
@@ -117,7 +143,7 @@ class UsbService : Service() {
      * This function will be called from MainActivity to write data through Serial Port
      */
     fun write(data: ByteArray?) {
-        if (serialOutputStream != null) serialOutputStream!!.write(data)
+        if (serialPort != null) serialPort!!.write(data)
     }
 
     fun setHandler(mHandler: Handler?) {
@@ -203,7 +229,7 @@ class UsbService : Service() {
         override fun run() {
             serialPort = UsbSerialDevice.createUsbSerialDevice(device, connection)
             if (serialPort != null) {
-                if (serialPort!!.syncOpen()) {
+                if (serialPort!!.open()) {
                     serialPortConnected = true
                     serialPort!!.setBaudRate(BAUD_RATE)
                     serialPort!!.setDataBits(UsbSerialInterface.DATA_BITS_8)
@@ -216,16 +242,16 @@ class UsbService : Service() {
                      * UsbSerialInterface.FLOW_CONTROL_DSR_DTR only for CP2102 and FT232
                      */
                     serialPort!!.setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF)
-//                    serialPort!!.read(mCallback)
+                    serialPort!!.read(mCallback)
 
                     /**
                      * InputStream and OutputStream will be null if you are using async api.
                      */
-                    serialOutputStream = serialPort!!.outputStream
-                    serialInputStream = serialPort!!.inputStream
-
-                    readThread = ReadThread()
-                    readThread!!.start()
+//                    serialOutputStream = serialPort!!.outputStream
+//                    serialInputStream = serialPort!!.inputStream
+//
+//                    readThread = ReadThread()
+//                    readThread!!.start()
 
                     serialPort!!.getCTS(ctsCallback)
                     serialPort!!.getDSR(dsrCallback)
@@ -301,7 +327,7 @@ class UsbService : Service() {
                             val commaSplit = split[split.size - 1].split(",")
 
                             if (commaSplit.size > 4) {
-                                mHandler!!.obtainMessage(SYNC_READ, commaSplit).sendToTarget()
+                                mHandler!!.obtainMessage(SYNC_READ, commaSplit.toString()).sendToTarget()
                             }
 
                             if(split.size > 10){

@@ -92,7 +92,7 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
             val sharedViewModel = ViewModelProvider(it).get(ModelViewModel::class.java)
             sharedViewModel.getSerialData()!!.observe(viewLifecycleOwner, { data ->
                 Log.d("Frag", data.toString())
-                speedTxt.text = data[0]
+                speedTxt.text = data[1]
             })
         }
     }

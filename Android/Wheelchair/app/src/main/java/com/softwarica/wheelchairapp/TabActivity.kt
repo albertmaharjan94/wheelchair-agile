@@ -126,13 +126,14 @@ class TabActivity : AppCompatActivity() {
         if(mode == Constants.REMOTE){
           remoteConnection()
         }else if(mode == Constants.DOCK){
-            setFilters() 
-              startService(
-                UsbService::class.java,
-                usbConnection,
-                null
-            )
+//            setFilters()
+//              startService(
+//                UsbService::class.java,
+//                usbConnection,
+//                null
+//            )
         }
+
     }
 
     fun viewInit(){
@@ -396,7 +397,7 @@ class TabActivity : AppCompatActivity() {
                 ).show()
                 UsbService.SYNC_READ -> {
                     val buffer = msg.obj as List<String>
-                    val stats = "${buffer[0].trim()} ${buffer[1].trim()} ${buffer[2].trim()} ${buffer[3].trim()}"
+                    val stats = "${buffer[1].trim()} ${buffer[2].trim()} ${buffer[3].trim()} ${buffer[4].trim()}"
                     activity.txtDebugger.text = stats
                     activity.modelViewModel!!.sendSerialData(buffer)
                 }
