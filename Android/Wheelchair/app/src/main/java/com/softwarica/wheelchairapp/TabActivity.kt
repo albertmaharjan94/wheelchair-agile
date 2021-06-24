@@ -13,10 +13,7 @@ import com.softwarica.wheelchairapp.ViewPager.CustomViewPager
 import com.softwarica.wheelchairapp.ui.main.SectionsPagerAdapter
 import com.softwarica.wheelchairapp.services.UsbService
 import io.ghyeok.stickyswitch.widget.StickySwitch
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
-import java.lang.Exception
+import java.io.*
 
 
 class TabActivity : AppCompatActivity() {
@@ -29,6 +26,7 @@ class TabActivity : AppCompatActivity() {
     private  lateinit var utilityLay : LinearLayout;
     private lateinit var conntxt : TextView
     private lateinit var txtDebugger : TextView
+    private  var  bt_status = false 
 
     var mode: String? = null
 
@@ -52,25 +50,35 @@ class TabActivity : AppCompatActivity() {
                 UsbService.ACTION_USB_PERMISSION_GRANTED ->{
                     USB_STATE = 1
                     conntxt.text = "USB Connected"
+                    connectLay.visibility = View.GONE
+
 //                "USB Permission connected"
                 }
                 UsbService.ACTION_USB_PERMISSION_NOT_GRANTED ->{
                     conntxt.text = "USB Permission not granted"
                     USB_STATE = 2
+                    connectLay.visibility = View.VISIBLE
+
 //                   "USB Permission not granted"
                 }
                 UsbService.ACTION_NO_USB ->{
                     USB_STATE = 3
                     conntxt.text = "No USB connected"
+                    connectLay.visibility = View.VISIBLE
 //                    "No USB connected"
                 }
                 UsbService.ACTION_USB_DISCONNECTED ->{
                     conntxt.text = "USB disconnected"
                     USB_STATE = 4
+                    connectLay.visibility = View.VISIBLE
+
 //                    "USB disconnected"
                 }
-                UsbService.ACTION_USB_NOT_SUPPORTED ->
+                UsbService.ACTION_USB_NOT_SUPPORTED -> {
                     USB_STATE = 5
+                    connectLay.visibility = View.VISIBLE
+                }
+
 //                   "USB device not supported"
             }
         }
@@ -78,9 +86,11 @@ class TabActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
+         mode = intent.getStringExtra(Constants.MODE)!!
+        bt_status  = intent.getBooleanExtra(Constants.BT_STATUS, false); 
         if(mode == Constants.DOCK){
             setFilters() // Start listening notifications from UsbService
+     
 
             startService(
                 UsbService::class.java,
@@ -104,6 +114,21 @@ class TabActivity : AppCompatActivity() {
         mode = intent.getStringExtra(Constants.MODE)
         val bt_status = intent.getBooleanExtra(Constants.BT_STATUS, false)
 
+        viewInit()
+
+        if(mode == Constants.REMOTE){
+          remoteConnection()
+        }else if(mode == Constants.DOCK){
+            setFilters() 
+              startService(
+                UsbService::class.java,
+                usbConnection,
+                null
+            )
+        }
+    }
+
+    fun viewInit(){
         val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager, mode!!)
         val viewPager: CustomViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
@@ -201,9 +226,6 @@ class TabActivity : AppCompatActivity() {
         }
     }
 
-    fun checkConnection(){
-
-    }
 
     private fun setFilters() {
         val filter = IntentFilter()
@@ -214,6 +236,52 @@ class TabActivity : AppCompatActivity() {
         filter.addAction(UsbService.ACTION_USB_PERMISSION_NOT_GRANTED)
         registerReceiver(mUsbReceiver, filter)
     }
+    fun remoteConnection(){
+        handler = object : Handler(Looper.getMainLooper()) {
+            override fun handleMessage(msg: Message) {
+             
+                Log.d("TAG", "handleMessage: " + msg.what)
+                when (msg.what) {
+                    CONNECTING_STATUS -> {
+
+                        when (msg.arg1) {
+                            1 -> {
+                                conntxt.text = "Connected"
+
+                            }
+                            -1 -> {
+                                conntxt.text = "Not Connected"
+                            }
+                            else -> {
+                                conntxt.text = "Network Error"
+                            }
+                        }
+                    }
+                    MESSAGE_READ -> {
+                        val arduinoMsg: String = msg.obj.toString() // Read message from Arduino
+                        when (arduinoMsg.toLowerCase()) {
+                            "led is turned on" -> {
+                            }
+                            "led is turned off" -> {
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        connectLay.visibility = View.GONE
+
+        if(bt_status){
+            handler?.obtainMessage(CONNECTING_STATUS, 1, -1)?.sendToTarget();
+            connectedThread = ConnectedThread(BluetoothFragment.mmSocket!!)
+            connectedThread?.start()
+        }
+
+
+    }
+
 
     private fun startService(
         service: Class<*>,
@@ -252,8 +320,6 @@ class TabActivity : AppCompatActivity() {
             else->{
                 forward.visibility = View.GONE; reverse.visibility = View.VISIBLE;
             }
-
-
         }
     }
 
@@ -323,8 +389,7 @@ class TabActivity : AppCompatActivity() {
 
     companion object{
 
-         const val CONNECTING_STATUS =
-            1 // used in bluetooth handler to identify message status
+         const val CONNECTING_STATUS = 1 // used in bluetooth handler to identify message status
 
         var USB_STATE = 3
 
@@ -338,31 +403,39 @@ class TabActivity : AppCompatActivity() {
         class ConnectedThread(private val mmSocket: BluetoothSocket) : Thread() {
             private val mmInStream: InputStream?
             private val mmOutStream: OutputStream?
+            var data2 = ""
+            private var input: BufferedReader? = null
             override fun run() {
-//                val buffer = ByteArray(1024) // buffer store for the stream
-//                var bytes = 0 // bytes returned from read()
-//                // Keep listening to the InputStream until an exception occurs
-//                while (true) {
-//                    try {
-//                        /*
-//                        Read from the InputStream from Arduino until termination character is reached.
-//                        Then send the whole String message to GUI Handler.
-//                         */
-//                        buffer[bytes] = mmInStream?.read() as Byte
-//                        var readMessage: String
-//                        if (buffer[bytes].equals("\n")) {
-//                            readMessage = String(buffer, 0, bytes)
-//                            Log.e("Arduino Message", readMessage)
-//                            handler?.obtainMessage(MESSAGE_READ, readMessage)?.sendToTarget()
-//                            bytes = 0
-//                        } else {
-//                            bytes++
-//                        }
-//                    } catch (e: IOException) {
-//                        e.printStackTrace()
-//                        break
-//                    }
-//                }
+                val buffer = ByteArray(1024) // buffer store for the stream
+                var bytes = 0 // bytes returned from read()
+                // Keep listening to the InputStream until an exception occurs
+
+                while (true) {
+                    try {
+                        /*
+                        Read from the InputStream from Arduino until termination character is reached.
+                        Then send the whole String message to GUI Handler.
+                         */
+
+                        var readMessage: String = ""
+                        var receiving = true
+                        while(receiving){
+                            var value = mmInStream?.read()?.toChar()!!
+                            Log.d("value", value.toString())
+                            if(value.toString() == "#"){
+                                receiving = false
+                                break
+                            }else readMessage+=value
+                        }
+
+                        Log.d("Messa", readMessage.split(",").toString())
+
+
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                        break
+                    }
+                }
             }
 
             /* Call this from the main activity to send data to the remote device */

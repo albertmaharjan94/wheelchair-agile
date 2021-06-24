@@ -1,6 +1,7 @@
 package com.softwarica.wheelchairapp
 
 import android.Manifest
+import android.app.ProgressDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
@@ -10,6 +11,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -96,15 +100,19 @@ class BluetoothFragment : BottomSheetDialogFragment() {
 
         if(bt.size > 0){
            bt.forEach({
-             if(mPairedAddressList.indexOf(it.address) == -1){
-                 mPairedDeviceList.add(it.name)
-                 mPairedAddressList.add(it.address)
-             }
+               if (mPairedAddressList.indexOf(it.address) == -1) {
+                   mPairedDeviceList.add(it.name)
+                   mPairedAddressList.add(it.address)
+               }
            })
         }
 
         pairedDevices.layoutManager = LinearLayoutManager(requireContext())
-        pairedDevices.adapter = PairedDeviceListAdapter(mPairedDeviceList, mPairedAddressList, requireContext())
+        pairedDevices.adapter = PairedDeviceListAdapter(
+            mPairedDeviceList,
+            mPairedAddressList,
+            requireContext()
+        )
 
 
 
@@ -118,6 +126,15 @@ class BluetoothFragment : BottomSheetDialogFragment() {
 
 
 
+        mHandler = object : Handler(Looper.getMainLooper()) {
+            override fun handleMessage(msg: Message) {
+                when(msg.what){
+                    LOADING_DIALOG -> {
+                        ProgressDialog.show(context, "Bluetooth Connection", "Connecting... Please Wait")
+                    }
+                }
+            }
+        }
 
         activity?.registerReceiver(bondReceiver, pairFilter)
         activity?.registerReceiver(mReceiver, filter)
@@ -193,9 +210,11 @@ class BluetoothFragment : BottomSheetDialogFragment() {
 
 
 companion object{
+    var mHandler : Handler ?= null
     private  var mBluetoothAdapter =  BluetoothAdapter.getDefaultAdapter();
     private var mBTList  = ArrayList<BluetoothDevice>()
     var mmSocket: BluetoothSocket? = null
+    private var LOADING_DIALOG = 1
 
     fun pairDevice(position: Int){
 
@@ -204,10 +223,10 @@ companion object{
         }
     }
 
-        class CreateConnectionThread(private val context: Context , address: String)  : Thread() {
+        class CreateConnectionThread(private val context: Context, address: String)  : Thread() {
         var bluetoothDevice: BluetoothDevice = mBluetoothAdapter.getRemoteDevice(address)
         var tmp: BluetoothSocket? = null
-        var uuid: UUID = bluetoothDevice.uuids[0].uuid
+        var uuid: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
 
 
          init {
@@ -233,7 +252,10 @@ companion object{
            try {
                // Connect to the remote device through the socket. This call blocks
                // until it succeeds or throws an exception.
+
+               mHandler?.obtainMessage(LOADING_DIALOG)?.sendToTarget()
                mmSocket!!.connect()
+
                Log.e("Status", "Device connected")
 
                var intent = Intent(context, TabActivity::class.java)
@@ -246,7 +268,7 @@ companion object{
                // Unable to connect; close the socket and return.
                try {
                    mmSocket!!.close()
-                   Log.e("TAG", "run: " + connectException.message )
+                   Log.e("TAG", "run: " + connectException.message)
                    Log.e("Status", "Cannot connect to device")
                } catch (closeException: IOException) {
 

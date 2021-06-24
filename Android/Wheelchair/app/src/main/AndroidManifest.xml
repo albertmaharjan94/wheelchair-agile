@@ -7,7 +7,9 @@
          location permissions for the "MyLocation" functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <uses-feature android:name="android.hardware.bluetooth" />
+
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -16,7 +18,6 @@
     <uses-feature
             android:name="android.hardware.usb.host"
             android:required="true" />
-
     <application
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
@@ -24,6 +25,7 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/Theme.WheelchairApp">
+        <activity android:name=".ui.main.Auth.LoginActivity"></activity>
         <activity android:name=".OptionScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,9 +48,7 @@
         <activity
                 android:name=".TabActivity"
                 android:label="@string/title_activity_tab"
-                android:theme="@style/Theme.WheelchairApp.NoActionBar">
-
-        </activity>
+                android:theme="@style/Theme.WheelchairApp.NoActionBar"></activity>
         <activity android:name=".MainActivity" />
 
         <service
