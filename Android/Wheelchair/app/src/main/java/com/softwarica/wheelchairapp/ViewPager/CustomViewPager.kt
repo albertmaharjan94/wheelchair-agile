@@ -33,7 +33,7 @@ class CustomViewPager : ViewPager {
             val viewpager: Class<*> = ViewPager::class.java
             val scroller = viewpager.getDeclaredField("mScroller")
             scroller.isAccessible = true
-            scroller[this] = MyScroller(getContext())
+            scroller[this] = MyScroller(context)
         } catch (e: Exception) {
             e.printStackTrace()
         }

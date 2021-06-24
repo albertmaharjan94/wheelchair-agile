@@ -1,26 +1,45 @@
 package com.softwarica.wheelchairapp.ui.main.Maps
 
+import android.Manifest
 import android.content.Context
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
+import android.content.pm.PackageManager
+import android.location.*
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.softwarica.wheelchairapp.R
+import java.io.IOException
+import java.util.*
 
-class MapsFragment : Fragment(), LocationListener {
+
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+class MapsFragment : Fragment() {
     var locationManager: LocationManager? = null
-    var current_loction: LatLng? = null
     var mapFragment: SupportMapFragment? = null
+    var current_location: LatLng? = null
+    var current_address: String? = null
+    var locationListener: LocationListener = MyLocationListener()
+
+    var mCurrLocationMarker: Marker? = null
+    var markerOptions: MarkerOptions = MarkerOptions()
+    private lateinit var mMap: GoogleMap
+
+    var mGoogleMap: GoogleMap? = null
+    var markerName: Marker? = null
+
+
     private val callback = OnMapReadyCallback { googleMap ->
         /**
          * Manipulates the map once available.
@@ -31,10 +50,33 @@ class MapsFragment : Fragment(), LocationListener {
          * install it inside the SupportMapFragment. This method will only be triggered once the
          * user has installed Google Play services and returned to the app.
          */
+        try {
+            if (markerName == null) {
+                markerName = googleMap.addMarker(MarkerOptions().position(
+                    current_location
+                ).title(current_address))
+            } else {
+                markerName!!.position = current_location
+                markerName!!.title = current_address
+            }
+            googleMap.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(current_location, 13F), 100, null
+            )
+            googleMap.uiSettings.isZoomControlsEnabled = true
+            googleMap.uiSettings.isCompassEnabled = true
+            googleMap.uiSettings.isMapToolbarEnabled = true
+//
+//            markerOptions.position(current_location)
+//            markerOptions.title(current_address)
+//            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
+//            mCurrLocationMarker = googleMap.addMarker(markerOptions)
+//
+//            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current_location, 17f))
 
-        val location = current_loction
-        googleMap.addMarker(MarkerOptions().position(location).title("Marker in Sydney"))
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(location))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
     }
 
     override fun onCreateView(
@@ -48,10 +90,35 @@ class MapsFragment : Fragment(), LocationListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager =
+            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        try {
+            locationManager!!.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER, 1000, 1F, locationListener
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
 
         mapFragment?.getMapAsync(callback)
-
     }
 
     companion object {
@@ -75,7 +142,34 @@ class MapsFragment : Fragment(), LocationListener {
         }
     }
 
-    override fun onLocationChanged(location: Location) {
-        mapFragment?.getMapAsync(callback)
+    private inner class MyLocationListener : LocationListener {
+        override fun onLocationChanged(loc: Location) {
+            current_location = LatLng(loc.latitude, loc.longitude)
+
+            /*------- To get city name from coordinates -------- */
+            val gcd = Geocoder(context, Locale.getDefault())
+            val addresses: List<Address>
+            try {
+                addresses = gcd.getFromLocation(
+                    loc.latitude,
+                    loc.longitude, 1
+                )
+                if (addresses.isNotEmpty()) {
+                    println(addresses[0].getLocality())
+                    current_address = addresses[0].locality
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+            val s = """
+            My Current City is: $current_address
+            """.trimIndent()
+            Log.d("CUrrent", s)
+            mapFragment?.getMapAsync(callback)
+        }
+
+        override fun onProviderDisabled(provider: String) {}
+        override fun onProviderEnabled(provider: String) {}
+        override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
     }
 }

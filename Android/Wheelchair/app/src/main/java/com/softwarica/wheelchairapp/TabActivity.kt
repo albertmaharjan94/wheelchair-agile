@@ -87,6 +87,8 @@ class TabActivity : AppCompatActivity() {
 
 //                   "USB device not supported"
             }
+
+            connectLay.visibility = View.GONE
         }
     }
 
@@ -215,6 +217,8 @@ class TabActivity : AppCompatActivity() {
             }
 
         }else if(mode == Constants.DOCK){
+
+            connectLay.visibility = View.GONE
             startService(
                 UsbService::class.java,
                 usbConnection,
@@ -234,6 +238,7 @@ class TabActivity : AppCompatActivity() {
         headlights_off.setOnClickListener {
             changeState("HOFF")
         }
+
     }
 
 
