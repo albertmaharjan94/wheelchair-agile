@@ -71,7 +71,7 @@
                     android:layout_marginRight="20dp"
                     />
             <com.robinhood.ticker.TickerView
-                    app:ticker_defaultPreferredScrollingDirection="down"
+                    app:ticker_defaultPreferredScrollingDirection="any"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:ticker_animationDuration="1500"

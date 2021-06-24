@@ -15,6 +15,7 @@ import android.os.IBinder
 import android.util.Log
 import com.felhr.usbserial.*
 import okio.Buffer
+import java.lang.Exception
 
 
 class UsbService : Service() {
@@ -113,7 +114,12 @@ class UsbService : Service() {
      * This function will be called from MainActivity to write data through Serial Port
      */
     fun write(data: ByteArray?) {
-        if (serialOutputStream != null) serialOutputStream!!.write(data)
+        try{
+            if (serialOutputStream != null) serialOutputStream!!.write(data)
+        }catch(e:Exception){
+            e.printStackTrace()
+        }
+
     }
 
     fun setHandler(mHandler: Handler?) {
@@ -230,7 +236,7 @@ class UsbService : Service() {
                     //
                     // Some Arduinos would need some sleep because firmware wait some time to know whether a new sketch is going
                     // to be uploaded or not
-                    sleep(500) // sleep some. YMMV with different chips.
+                    sleep(1000) // sleep some. YMMV with different chips.
 
                     // Everything went as expected. Send an intent to MainActivity
                     val intent = Intent(ACTION_USB_READY)
@@ -282,31 +288,35 @@ class UsbService : Service() {
     private inner class ReadThread : Thread() {
         override fun run() {
             while (true) {
-                val tmpBuffer = ByteArray(10)
-                val n = serialPort!!.syncRead(tmpBuffer, 0)
+                try{
+                    val tmpBuffer = ByteArray(10)
+                    val n = serialPort!!.syncRead(tmpBuffer, 0)
 
+                    if (n > 0) {
+                        buffer.write(tmpBuffer, 0, n)
+                        val receivedStr = buffer.readUtf8Line()
+                        data2 += receivedStr
 
-                if (n > 0) {
-                    buffer.write(tmpBuffer, 0, n)
-                    val receivedStr = buffer.readUtf8Line()
-                    data2 += receivedStr
+                        if(data2.isNotEmpty()){
+                            val split  = data2.split("#");
 
-                    if(data2.isNotEmpty()){
-                        val split  = data2.split("#");
+                            if(split.isNotEmpty()){
+                                val commaSplit = split[split.size - 1].split(",")
 
-                        if(split.isNotEmpty()){
-                            val commaSplit = split[split.size - 1].split(",")
+                                if (commaSplit.size > 4) {
+                                    mHandler!!.obtainMessage(SYNC_READ, commaSplit).sendToTarget()
+                                }
 
-                            if (commaSplit.size > 4) {
-                                mHandler!!.obtainMessage(SYNC_READ, commaSplit).sendToTarget()
-                            }
-
-                            if(split.size > 10){
-                                data2 = ""
+                                if(split.size > 10){
+                                    data2 = ""
+                                }
                             }
                         }
                     }
+                }catch (e: Exception){
+                    e.printStackTrace()
                 }
+
             }
         }
 

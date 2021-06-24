@@ -7,11 +7,13 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.tabs.TabLayout
 import com.softwarica.wheelchairapp.Utils.Constants
 import com.softwarica.wheelchairapp.ViewPager.CustomViewPager
-import com.softwarica.wheelchairapp.ui.main.SectionsPagerAdapter
 import com.softwarica.wheelchairapp.services.UsbService
+import com.softwarica.wheelchairapp.ui.main.Dash.ModelViewModel
+import com.softwarica.wheelchairapp.ui.main.SectionsPagerAdapter
 import io.ghyeok.stickyswitch.widget.StickySwitch
 import java.io.*
 
@@ -26,7 +28,8 @@ class TabActivity : AppCompatActivity() {
     private  lateinit var utilityLay : LinearLayout;
     private lateinit var conntxt : TextView
     private lateinit var txtDebugger : TextView
-    private  var  bt_status = false 
+    private  var  bt_status = false
+    private var modelViewModel: ModelViewModel? = null
 
     var mode: String? = null
 
@@ -51,30 +54,33 @@ class TabActivity : AppCompatActivity() {
                     USB_STATE = 1
                     conntxt.text = "USB Connected"
                     connectLay.visibility = View.GONE
-
 //                "USB Permission connected"
                 }
                 UsbService.ACTION_USB_PERMISSION_NOT_GRANTED ->{
                     conntxt.text = "USB Permission not granted"
                     USB_STATE = 2
                     connectLay.visibility = View.VISIBLE
+                    wheelChairStop()
 
 //                   "USB Permission not granted"
                 }
                 UsbService.ACTION_NO_USB ->{
                     USB_STATE = 3
                     conntxt.text = "No USB connected"
+                    wheelChairStop()
                     connectLay.visibility = View.VISIBLE
 //                    "No USB connected"
                 }
                 UsbService.ACTION_USB_DISCONNECTED ->{
                     conntxt.text = "USB disconnected"
+                    wheelChairStop()
                     USB_STATE = 4
                     connectLay.visibility = View.VISIBLE
 
 //                    "USB disconnected"
                 }
                 UsbService.ACTION_USB_NOT_SUPPORTED -> {
+                    wheelChairStop()
                     USB_STATE = 5
                     connectLay.visibility = View.VISIBLE
                 }
@@ -116,6 +122,7 @@ class TabActivity : AppCompatActivity() {
 
         viewInit()
 
+
         if(mode == Constants.REMOTE){
           remoteConnection()
         }else if(mode == Constants.DOCK){
@@ -132,6 +139,9 @@ class TabActivity : AppCompatActivity() {
         val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager, mode!!)
         val viewPager: CustomViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
+
+        modelViewModel = ViewModelProvider(this).get(ModelViewModel::class.java)
+        modelViewModel!!.init()
 
         val tabs: TabLayout = findViewById(R.id.tabs)
 
@@ -153,12 +163,11 @@ class TabActivity : AppCompatActivity() {
         startbtn = findViewById(R.id.startbtn)
         startbtn.setOnClickListener {
             Log.d("TAG", "onCreate: " + startbtn.getDirection())
-            if(startbtn.getDirection().toString().equals("RIGHT")){
+            if(startbtn.getDirection().toString() == "RIGHT"){
                 wheelChairStart()
-            }else if(startbtn.getDirection().toString().equals("LEFT")){
+            }else if(startbtn.getDirection().toString() == "LEFT"){
                 wheelChairStop()
             }
-
         }
         txtDebugger.text = mode
         if(mode == Constants.REMOTE){
@@ -324,15 +333,24 @@ class TabActivity : AppCompatActivity() {
     }
 
     fun wheelChairStart () {
-        if(mode == Constants.DOCK){
-            usbService?.write("1#0#0#0\n".toByteArray())
+        try{
+            if(mode == Constants.DOCK){
+                usbService?.write("1#0#0#0\n".toByteArray())
+            }
+        }catch(e: Exception){
+            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
         }
+
         utilityLay.visibility = View.VISIBLE
     }
 
     fun wheelChairStop(){
-        if(mode == Constants.DOCK){
-            usbService?.write("0#0#0#0\n".toByteArray())
+        try{
+            if(mode == Constants.DOCK){
+                usbService?.write("0#0#0#0\n".toByteArray())
+            }
+        }catch(e: Exception){
+            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
         }
         utilityLay.visibility = View.GONE
         forward.visibility = View.GONE
@@ -380,6 +398,7 @@ class TabActivity : AppCompatActivity() {
                     val buffer = msg.obj as List<String>
                     val stats = "${buffer[0].trim()} ${buffer[1].trim()} ${buffer[2].trim()} ${buffer[3].trim()}"
                     activity.txtDebugger.text = stats
+                    activity.modelViewModel!!.sendSerialData(buffer)
                 }
             }
         }

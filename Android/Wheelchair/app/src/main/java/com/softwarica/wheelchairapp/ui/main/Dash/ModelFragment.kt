@@ -17,6 +17,8 @@ import androidx.dynamicanimation.animation.DynamicAnimation
 import androidx.fragment.app.Fragment
 import androidx.dynamicanimation.animation.FlingAnimation
 import androidx.dynamicanimation.animation.FloatPropertyCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.google.ar.sceneform.HitTestResult
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.Scene
@@ -82,6 +84,17 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
             param2 = it.getString(ARG_PARAM2)
         }
 
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        activity?.let { it ->
+            val sharedViewModel = ViewModelProvider(it).get(ModelViewModel::class.java)
+            sharedViewModel.getSerialData()!!.observe(viewLifecycleOwner, { data ->
+                Log.d("Frag", data.toString())
+                speedTxt.text = data[0]
+            })
+        }
     }
 
     override fun onCreateView(
