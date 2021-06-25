@@ -2,11 +2,13 @@ package com.softwarica.wheelchairapp
 
 import android.bluetooth.BluetoothSocket
 import android.content.*
+import android.location.LocationManager
 import android.os.*
 import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.tabs.TabLayout
 import com.softwarica.wheelchairapp.Utils.Constants
@@ -121,7 +123,6 @@ class TabActivity : AppCompatActivity() {
         setContentView(R.layout.activity_tab)
         mode = intent.getStringExtra(Constants.MODE)
         val bt_status = intent.getBooleanExtra(Constants.BT_STATUS, false)
-
         viewInit()
 
 

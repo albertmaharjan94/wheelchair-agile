@@ -1,21 +1,31 @@
 package com.softwarica.wheelchairapp.ui.main.Maps
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.AlertDialog
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.*
 import android.os.Bundle
+import android.telephony.SmsManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -27,20 +37,24 @@ import java.util.*
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class MapsFragment : Fragment() {
     var locationManager: LocationManager? = null
-    var mapFragment: SupportMapFragment? = null
     var current_location: LatLng? = null
     var current_address: String? = null
     var locationListener: LocationListener = MyLocationListener()
 
     var mCurrLocationMarker: Marker? = null
-    var markerOptions: MarkerOptions = MarkerOptions()
-    private lateinit var mMap: GoogleMap
-
-    var mGoogleMap: GoogleMap? = null
+    var mapView: MapView? = null
     var markerName: Marker? = null
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var btnEmergency: Button? = null
+    private var smsManager: SmsManager? = null
 
+    var first_marking = true
+    private var googleMap: GoogleMap? = null
 
-    private val callback = OnMapReadyCallback { googleMap ->
+    val emergency_number = "+9779808438993"
+
+    @SuppressLint("MissingPermission")
+    private val callback = OnMapReadyCallback { mMap ->
         /**
          * Manipulates the map once available.
          * This callback is triggered when the map is ready to be used.
@@ -51,28 +65,29 @@ class MapsFragment : Fragment() {
          * user has installed Google Play services and returned to the app.
          */
         try {
+            googleMap = mMap
+
+            // For showing a move to my location button
+            googleMap!!.isMyLocationEnabled = true
+
             if (markerName == null) {
-                markerName = googleMap.addMarker(MarkerOptions().position(
-                    current_location
-                ).title(current_address))
+                markerName = googleMap!!.addMarker(
+                    MarkerOptions().position(
+                        current_location
+                    ).title(current_address)
+                )
             } else {
                 markerName!!.position = current_location
                 markerName!!.title = current_address
-            }
-            googleMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(current_location, 13F), 100, null
-            )
-            googleMap.uiSettings.isZoomControlsEnabled = true
-            googleMap.uiSettings.isCompassEnabled = true
-            googleMap.uiSettings.isMapToolbarEnabled = true
-//
-//            markerOptions.position(current_location)
-//            markerOptions.title(current_address)
-//            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
-//            mCurrLocationMarker = googleMap.addMarker(markerOptions)
-//
-//            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current_location, 17f))
 
+            }
+            if (first_marking) {
+                // For zooming automatically to the location of the marker
+                val cameraPosition =
+                    CameraPosition.Builder().target(current_location).zoom(12f).build()
+                googleMap!!.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+                first_marking = false
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -87,28 +102,100 @@ class MapsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_maps, container, false)
     }
 
+    override fun onPause() {
+        super.onPause()
+        try {
+            requireActivity().unregisterReceiver(sendBroadcastReceiver)
+            requireActivity().unregisterReceiver(deliveryBroadcastReciever)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        try {
+            requireActivity().unregisterReceiver(sendBroadcastReceiver)
+            requireActivity().unregisterReceiver(deliveryBroadcastReciever)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        requestMapPermission()
+
+        btnEmergency = view.findViewById(R.id.btnEmergency)
+        mapView = view.findViewById(R.id.mapView) as MapView
+        mapView!!.onCreate(savedInstanceState)
+        mapView!!.onResume()
+        smsManager = SmsManager.getDefault()
+        btnEmergency!!.setOnClickListener {
+            AlertDialog.Builder(requireActivity())
+                .setTitle("Send Emergency Message")
+                .setMessage("Send your location to emergency contact?")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton("Send") { _, _ ->
+                    if (current_location != null ||
+                        requestMapPermission()
+                    ) {
+                        try {
+                            fusedLocationClient.lastLocation
+                                .addOnSuccessListener { loc: Location? ->
+                                    Log.d("location", loc.toString())
+                                    if (loc != null) {
+                                        current_location = LatLng(loc.latitude, loc.longitude)
+                                        current_address = getLocationAddress(loc)
+                                        mapView!!.getMapAsync(callback)
+                                    }
+                                }
+                        } catch (e: java.lang.Exception) {
+                            e.printStackTrace()
+                        }
+                        sendSMS(emergency_number,
+                            "!!!EMERGENCY!!!\n" +
+                                    "Latitude: ${current_location!!.latitude} , Longitude: ${current_location!!.longitude}\n" +
+                                    "Address: ${current_address}\n" +
+                                    "http://www.google.com/maps/place/${current_location!!.latitude},${current_location!!.longitude}"
+                        )
+                    } else {
+                        Toast.makeText(
+                            requireActivity(),
+                            "Required permission not found. Please try again.",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+
+                    }
+
+                }
+                .setNegativeButton("Cancel", null).show()
+        }
+
+
+        try {
+            MapsInitializer.initialize(requireActivity().applicationContext)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+
+
         locationManager =
             requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return
-        }
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { loc: Location? ->
+                Log.d("location", loc.toString())
+                if (loc != null) {
+                    current_location = LatLng(loc.latitude, loc.longitude)
+                    current_address = getLocationAddress(loc)
+                    mapView!!.getMapAsync(callback)
+                }
+            }
+
         try {
             locationManager!!.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER, 1000, 1F, locationListener
@@ -118,7 +205,6 @@ class MapsFragment : Fragment() {
         }
 
 
-        mapFragment?.getMapAsync(callback)
     }
 
     companion object {
@@ -143,33 +229,145 @@ class MapsFragment : Fragment() {
     }
 
     private inner class MyLocationListener : LocationListener {
+        @SuppressLint("MissingPermission")
         override fun onLocationChanged(loc: Location) {
-            current_location = LatLng(loc.latitude, loc.longitude)
+            // tracker function here
 
-            /*------- To get city name from coordinates -------- */
-            val gcd = Geocoder(context, Locale.getDefault())
-            val addresses: List<Address>
-            try {
-                addresses = gcd.getFromLocation(
-                    loc.latitude,
-                    loc.longitude, 1
-                )
-                if (addresses.isNotEmpty()) {
-                    println(addresses[0].getLocality())
-                    current_address = addresses[0].locality
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-            val s = """
-            My Current City is: $current_address
-            """.trimIndent()
-            Log.d("CUrrent", s)
-            mapFragment?.getMapAsync(callback)
+            current_address = getLocationAddress(loc)
+            mapView!!.getMapAsync(callback)
+
         }
 
         override fun onProviderDisabled(provider: String) {}
         override fun onProviderEnabled(provider: String) {}
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
+    }
+
+    private fun getLocationAddress(loc: Location): String {
+        val gcd = Geocoder(context, Locale.getDefault())
+        var _current_address = ""
+        val addresses: List<Address>
+        try {
+            addresses = gcd.getFromLocation(
+                loc.latitude,
+                loc.longitude, 1
+            )
+            if (addresses.isNotEmpty()) {
+                println(addresses[0].locality)
+                _current_address = addresses[0].locality
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return _current_address
+    }
+
+    //     sms
+    var sendBroadcastReceiver: BroadcastReceiver? = SentReceiver()
+    var deliveryBroadcastReciever: BroadcastReceiver = DeliverReceiver()
+
+    internal class DeliverReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, arg1: Intent) {
+            when (resultCode) {
+                Activity.RESULT_OK -> Toast.makeText(
+                    context, "Message Delivered",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Activity.RESULT_CANCELED -> Toast.makeText(
+                    context, "Message Not Delivered",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun sendSMS(phoneNumber: String, message: String) {
+        val SENT = "SMS_SENT"
+        val DELIVERED = "SMS_DELIVERED"
+        val sentPI = PendingIntent.getBroadcast(
+            context, 0, Intent(
+                SENT
+            ), 0
+        )
+        val deliveredPI = PendingIntent.getBroadcast(
+            context, 0,
+            Intent(DELIVERED), 0
+        )
+        requireActivity().registerReceiver(sendBroadcastReceiver, IntentFilter(SENT))
+        requireActivity().registerReceiver(deliveryBroadcastReciever, IntentFilter(DELIVERED))
+        val sms = SmsManager.getDefault()
+        sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI)
+
+    }
+
+    internal class SentReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, arg1: Intent) {
+            when (resultCode) {
+                Activity.RESULT_OK -> {
+                    Toast.makeText(context, "Message Sent", Toast.LENGTH_SHORT)
+                        .show()
+                }
+                SmsManager.RESULT_ERROR_GENERIC_FAILURE -> Toast.makeText(
+                    context, "Generic failure",
+                    Toast.LENGTH_SHORT
+                ).show()
+                SmsManager.RESULT_ERROR_NO_SERVICE -> Toast.makeText(
+                    context, "No service",
+                    Toast.LENGTH_SHORT
+                ).show()
+                SmsManager.RESULT_ERROR_NULL_PDU -> Toast.makeText(
+                    context,
+                    "Null PDU",
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
+                SmsManager.RESULT_ERROR_RADIO_OFF -> Toast.makeText(
+                    context, "Radio off",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun requestMapPermission(): Boolean {
+        val send_sms = ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.SEND_SMS
+        )
+        val read_sms = ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.READ_SMS
+        )
+        val cor_loc = ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+        val fine_loc = ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+        if (send_sms != PackageManager.PERMISSION_GRANTED
+            || read_sms != PackageManager.PERMISSION_GRANTED
+            || cor_loc != PackageManager.PERMISSION_GRANTED
+            || fine_loc != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(
+                    Manifest.permission.SEND_SMS,
+                    Manifest.permission.READ_SMS,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ),
+                642
+            )
+        } else {
+            Log.d("DISCOVERING-PERMISSIONS", "Permissions Granted")
+        }
+
+        return requireContext().checkCallingOrSelfPermission(Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED
+                && requireContext().checkCallingOrSelfPermission(Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED
+                && requireContext().checkCallingOrSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && requireContext().checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
     }
 }
