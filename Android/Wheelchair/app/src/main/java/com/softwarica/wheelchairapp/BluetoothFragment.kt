@@ -42,9 +42,9 @@ class BluetoothFragment : BottomSheetDialogFragment() {
     private var mPairedAddressList = ArrayList<String>()
 
     private lateinit var listView: RecyclerView
-    private lateinit var loading : ProgressBar
-    private lateinit var listLay : LinearLayout
-    private lateinit var pairedDevices : RecyclerView
+    private lateinit var loading: ProgressBar
+    private lateinit var listLay: LinearLayout
+    private lateinit var pairedDevices: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -77,7 +77,8 @@ class BluetoothFragment : BottomSheetDialogFragment() {
         if (permission1 != PackageManager.PERMISSION_GRANTED
             || permission2 != PackageManager.PERMISSION_GRANTED
             || permission3 != PackageManager.PERMISSION_GRANTED
-            || permission4 != PackageManager.PERMISSION_GRANTED) {
+            || permission4 != PackageManager.PERMISSION_GRANTED
+        ) {
             ActivityCompat.requestPermissions(
                 requireActivity(),
                 arrayOf(
@@ -100,13 +101,13 @@ class BluetoothFragment : BottomSheetDialogFragment() {
         mBluetoothAdapter.startDiscovery();
         var bt = mBluetoothAdapter.bondedDevices
 
-        if(bt.size > 0){
-           bt.forEach {
-               if (mPairedAddressList.indexOf(it.address) == -1) {
-                   mPairedDeviceList.add(it.name)
-                   mPairedAddressList.add(it.address)
-               }
-           }
+        if (bt.size > 0) {
+            bt.forEach {
+                if (mPairedAddressList.indexOf(it.address) == -1) {
+                    mPairedDeviceList.add(it.name)
+                    mPairedAddressList.add(it.address)
+                }
+            }
         }
 
         pairedDevices.layoutManager = LinearLayoutManager(requireContext())
@@ -117,33 +118,24 @@ class BluetoothFragment : BottomSheetDialogFragment() {
         )
 
 
-
         var filter = IntentFilter()
-            filter.addAction(BluetoothDevice.ACTION_FOUND)
-             filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
+        filter.addAction(BluetoothDevice.ACTION_FOUND)
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
 
         var pairFilter = IntentFilter()
-            pairFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
+        pairFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
 
 
 
 
         mHandler = object : Handler(Looper.getMainLooper()) {
             override fun handleMessage(msg: Message) {
-                when(msg.what){
+                when (msg.what) {
                     LOADING_DIALOG -> {
                         val progress: ProgressDialog = ProgressDialog(requireContext())
                         progress.setTitle("Bluetooth Connection");
                         progress.setMessage("Please wait while we connect to devices...");
                         progress.show()
-
-                        val progressRunnable = Runnable {
-                            progress.cancel()
-                            Toast.makeText(requireContext(), "Bluetooth device not connected. Please try again.", Toast.LENGTH_LONG).show()
-                        }
-
-                        val pdCanceller = Handler()
-                        pdCanceller.postDelayed(progressRunnable, 5000)
                     }
                 }
             }
@@ -163,14 +155,14 @@ class BluetoothFragment : BottomSheetDialogFragment() {
             if (action == BluetoothDevice.ACTION_FOUND) {
                 val device = intent
                     .getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-                if(device!!.name != null){
-                    if(mDeviceList.indexOf(device?.name) == -1){
+                if (device!!.name != null) {
+                    if (mDeviceList.indexOf(device?.name) == -1) {
                         mDeviceList.add(device?.name!!)
                         mBTList.add(device)
                     }
 
                 }
-            }else if(action == BluetoothAdapter.ACTION_DISCOVERY_FINISHED){
+            } else if (action == BluetoothAdapter.ACTION_DISCOVERY_FINISHED) {
                 loading.visibility = View.GONE
                 listLay.visibility = View.VISIBLE
                 listView.layoutManager = LinearLayoutManager(requireContext())
@@ -179,7 +171,7 @@ class BluetoothFragment : BottomSheetDialogFragment() {
         }
     }
 
-    var bondReceiver : BroadcastReceiver = object : BroadcastReceiver() {
+    var bondReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             val action = intent.action
 
@@ -187,7 +179,7 @@ class BluetoothFragment : BottomSheetDialogFragment() {
                 val mDevice: BluetoothDevice =
                     intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)!!
 
-                when(mDevice.bondState){
+                when (mDevice.bondState) {
                     BluetoothDevice.BOND_BONDED -> {
                         Toast.makeText(requireContext(), "Paired", Toast.LENGTH_SHORT).show()
 
@@ -217,89 +209,90 @@ class BluetoothFragment : BottomSheetDialogFragment() {
 
         //mBluetoothAdapter.cancelDiscovery();
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
     }
 
 
-companion object{
-    var mHandler : Handler ?= null
-    private  var mBluetoothAdapter =  BluetoothAdapter.getDefaultAdapter();
-    private var mBTList  = ArrayList<BluetoothDevice>()
-    var mmSocket: BluetoothSocket? = null
-    private var LOADING_DIALOG = 1
+    companion object {
+        var mHandler: Handler? = null
+        private var mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        private var mBTList = ArrayList<BluetoothDevice>()
+        var mmSocket: BluetoothSocket? = null
+        private var LOADING_DIALOG = 1
 
-    fun pairDevice(position: Int){
+        fun pairDevice(position: Int) {
 
-        if(position != null){
-        mBTList.get(position).createBond();
-        }
-    }
-
-        class CreateConnectionThread(private val context: Context, address: String)  : Thread() {
-        var bluetoothDevice: BluetoothDevice = mBluetoothAdapter.getRemoteDevice(address)
-        var tmp: BluetoothSocket? = null
-        var uuid: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
-
-
-         init {
-             try {
-                 /*
-                 Get a BluetoothSocket to connect with the given BluetoothDevice.
-                 Due to Android device varieties,the method below may not work fo different devices.
-                 You should try using other methods i.e. :
-                 tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
-                  */
-                 tmp = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid);
-
-             } catch (e: IOException) {
-                 print(e.printStackTrace())
-             }
-
-             mmSocket = tmp;
-         }
-
-       override fun run() {
-           val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-           bluetoothAdapter.cancelDiscovery()
-           try {
-               // Connect to the remote device through the socket. This call blocks
-               // until it succeeds or throws an exception.
-
-               mHandler?.obtainMessage(LOADING_DIALOG)?.sendToTarget()
-               mmSocket!!.connect()
-
-               Log.e("Status", "Device connected")
-
-               var intent = Intent(context, TabActivity::class.java)
-               intent.putExtra(Constants.MODE, Constants.REMOTE)
-               intent.putExtra(Constants.BT_STATUS, Constants.CONNECTED)
-
-               ContextCompat.startActivity(context!!, intent, null)
-
-           } catch (connectException: IOException) {
-               // Unable to connect; close the socket and return.
-               try {
-                   mmSocket!!.close()
-                   Log.e("TAG", "run: " + connectException.message)
-                   Log.e("Status", "Cannot connect to device")
-               } catch (closeException: IOException) {
-
-               }
-               return
-           }
-       }
-
-        // Closes the client socket and causes the thread to finish.
-        fun cancel() {
-            try {
-                mmSocket!!.close()
-            } catch (e: IOException) {
-                Log.e("TAG", "Could not close the client socket", e)
+            if (position != null) {
+                mBTList.get(position).createBond();
             }
         }
 
-}
-}
+        class CreateConnectionThread(private val context: Context, address: String) : Thread() {
+            var bluetoothDevice: BluetoothDevice = mBluetoothAdapter.getRemoteDevice(address)
+            var tmp: BluetoothSocket? = null
+            var uuid: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
+
+
+            init {
+                try {
+                    /*
+                    Get a BluetoothSocket to connect with the given BluetoothDevice.
+                    Due to Android device varieties,the method below may not work fo different devices.
+                    You should try using other methods i.e. :
+                    tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
+                     */
+                    tmp = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid);
+
+                } catch (e: IOException) {
+                    print(e.printStackTrace())
+                }
+
+                mmSocket = tmp;
+            }
+
+            override fun run() {
+                val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+                bluetoothAdapter.cancelDiscovery()
+                try {
+                    // Connect to the remote device through the socket. This call blocks
+                    // until it succeeds or throws an exception.
+
+                    mHandler?.obtainMessage(LOADING_DIALOG)?.sendToTarget()
+                    mmSocket!!.connect()
+
+                    Log.e("Status", "Device connected")
+
+                    var intent = Intent(context, TabActivity::class.java)
+                    intent.putExtra(Constants.MODE, Constants.REMOTE)
+                    intent.putExtra(Constants.BT_STATUS, Constants.CONNECTED)
+
+                    ContextCompat.startActivity(context!!, intent, null)
+
+                } catch (connectException: IOException) {
+                    // Unable to connect; close the socket and return.
+                    try {
+                        mmSocket!!.close()
+                        Log.e("TAG", "run: " + connectException.message)
+                        Log.e("Status", "Cannot connect to device")
+                    } catch (closeException: IOException) {
+
+                    }
+                    return
+                }
+            }
+
+            // Closes the client socket and causes the thread to finish.
+            fun cancel() {
+                try {
+                    mmSocket!!.close()
+                } catch (e: IOException) {
+                    Log.e("TAG", "Could not close the client socket", e)
+                }
+            }
+
+        }
+    }
 
 }

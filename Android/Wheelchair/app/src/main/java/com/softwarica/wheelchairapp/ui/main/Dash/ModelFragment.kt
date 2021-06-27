@@ -122,7 +122,7 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
             val res = degreeToSpeed(angle, strength, safe_degree = 10)
             try{
                 val ct = TabActivity.connectedThread
-                Log.d("Test", "${res.elementAtOrNull(0)}#${res.elementAt(1)}\n")
+//                Log.d("Test", "${res.elementAtOrNull(0)}#${res.elementAt(1)}\n")
                 ct!!.write("${res.elementAtOrNull(0)}#${res.elementAt(1)}\n")
             }catch (e: Exception){
                 print(e.stackTrace)

@@ -15,6 +15,7 @@ import android.os.IBinder
 import android.util.Log
 import com.felhr.usbserial.*
 import com.felhr.usbserial.UsbSerialInterface.UsbReadCallback
+import com.softwarica.wheelchairapp.Utils.SerialStringMaker
 import okio.Buffer
 import java.io.UnsupportedEncodingException
 import java.nio.charset.StandardCharsets
@@ -30,10 +31,8 @@ class UsbService : Service() {
     private var serialPort: UsbSerialDevice? = null
     private var serialPortConnected = false
     private val buffer: Buffer = Buffer()
-    private var readThread: ReadThread? = null
 
-    private var serialInputStream: SerialInputStream? = null
-    private var serialOutputStream: SerialOutputStream? = null
+    private var stringMaker = SerialStringMaker()
 
     private val ctsCallback: UsbSerialInterface.UsbCTSCallback = UsbSerialInterface.UsbCTSCallback {
         if (mHandler != null) mHandler!!.obtainMessage(CTS_CHANGE).sendToTarget()
@@ -118,6 +117,15 @@ class UsbService : Service() {
                 val data = String(arg0, StandardCharsets.UTF_8)
                 data2 += data
                 if (data2.isNotEmpty()) {
+
+//                    val finalString = stringMaker.makeString(data2, 6, "#", ",")
+//                    if(finalString!=null){
+//                        mHandler!!.obtainMessage(SYNC_READ, finalString).sendToTarget()
+//                    }
+//                    if(data2.length > 128){
+//                        data2 = ""
+//                    }
+
                     val split = data2.split("#");
 
                     if (split.isNotEmpty()) {

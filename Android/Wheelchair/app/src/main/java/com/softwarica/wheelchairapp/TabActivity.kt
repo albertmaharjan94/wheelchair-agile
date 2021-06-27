@@ -1,18 +1,16 @@
 package com.softwarica.wheelchairapp
 
-import android.app.Activity
 import android.bluetooth.BluetoothSocket
 import android.content.*
-import android.location.LocationManager
 import android.os.*
 import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.tabs.TabLayout
 import com.softwarica.wheelchairapp.Utils.Constants
+import com.softwarica.wheelchairapp.Utils.SerialStringMaker
 import com.softwarica.wheelchairapp.ViewPager.CustomViewPager
 import com.softwarica.wheelchairapp.services.UsbService
 import com.softwarica.wheelchairapp.ui.main.Dash.ModelViewModel
@@ -22,17 +20,18 @@ import java.io.*
 
 
 class TabActivity : AppCompatActivity() {
-    private lateinit var startbtn : StickySwitch;
-    private lateinit var reverse : ImageButton;
-    private lateinit var forward : ImageButton;
-    private lateinit var headlights : ImageButton;
-    private lateinit var headlights_off : ImageButton;
-    private lateinit var connectLay : RelativeLayout;
-    private  lateinit var utilityLay : LinearLayout;
-    private lateinit var conntxt : TextView
-    private lateinit var txtDebugger : TextView
-    private  var  bt_status = false
+    private lateinit var startbtn: StickySwitch;
+    private lateinit var reverse: ImageButton;
+    private lateinit var forward: ImageButton;
+    private lateinit var headlights: ImageButton;
+    private lateinit var headlights_off: ImageButton;
+    private lateinit var connectLay: RelativeLayout;
+    private lateinit var utilityLay: LinearLayout;
+    private lateinit var conntxt: TextView
+    private lateinit var txtDebugger: TextView
+    private var bt_status = false
     private var modelViewModel: ModelViewModel? = null
+
 
     var mode: String? = null
 
@@ -44,6 +43,7 @@ class TabActivity : AppCompatActivity() {
             usbService = (arg1 as UsbService.UsbBinder).service
             usbService!!.setHandler(uHandler)
         }
+
         override fun onServiceDisconnected(arg0: ComponentName) {
             usbService = null
         }
@@ -53,13 +53,13 @@ class TabActivity : AppCompatActivity() {
         override fun onReceive(context: Context, intent: Intent) {
             // default no usb connection
             when (intent.action) {
-                UsbService.ACTION_USB_PERMISSION_GRANTED ->{
+                UsbService.ACTION_USB_PERMISSION_GRANTED -> {
                     USB_STATE = 1
                     conntxt.text = "USB Connected"
                     connectLay.visibility = View.GONE
 //                "USB Permission connected"
                 }
-                UsbService.ACTION_USB_PERMISSION_NOT_GRANTED ->{
+                UsbService.ACTION_USB_PERMISSION_NOT_GRANTED -> {
                     conntxt.text = "USB Permission not granted"
                     USB_STATE = 2
                     connectLay.visibility = View.VISIBLE
@@ -67,14 +67,14 @@ class TabActivity : AppCompatActivity() {
 
 //                   "USB Permission not granted"
                 }
-                UsbService.ACTION_NO_USB ->{
+                UsbService.ACTION_NO_USB -> {
                     USB_STATE = 3
                     conntxt.text = "No USB connected"
                     wheelChairStop()
                     connectLay.visibility = View.VISIBLE
 //                    "No USB connected"
                 }
-                UsbService.ACTION_USB_DISCONNECTED ->{
+                UsbService.ACTION_USB_DISCONNECTED -> {
                     conntxt.text = "USB disconnected"
                     wheelChairStop()
                     USB_STATE = 4
@@ -97,11 +97,11 @@ class TabActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-         mode = intent.getStringExtra(Constants.MODE)!!
-        bt_status  = intent.getBooleanExtra(Constants.BT_STATUS, false); 
-        if(mode == Constants.DOCK){
+        mode = intent.getStringExtra(Constants.MODE)!!
+        bt_status = intent.getBooleanExtra(Constants.BT_STATUS, false);
+        if (mode == Constants.DOCK) {
             setFilters() // Start listening notifications from UsbService
-     
+
 
             startService(
                 UsbService::class.java,
@@ -111,9 +111,9 @@ class TabActivity : AppCompatActivity() {
         }
     }
 
-    override fun onPause(){
+    override fun onPause() {
         super.onPause()
-        if(mode == Constants.DOCK){
+        if (mode == Constants.DOCK) {
             unregisterReceiver(mUsbReceiver)
             unbindService(usbConnection)
         }
@@ -123,13 +123,13 @@ class TabActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tab)
         mode = intent.getStringExtra(Constants.MODE)
-        val bt_status = intent.getBooleanExtra(Constants.BT_STATUS, false)
+        bt_status = intent.getBooleanExtra(Constants.BT_STATUS, false)
         viewInit()
 
 
-        if(mode == Constants.REMOTE){
-          remoteConnection()
-        }else if(mode == Constants.DOCK){
+        if (mode == Constants.REMOTE) {
+            remoteConnection()
+        } else if (mode == Constants.DOCK) {
 //            setFilters()
 //              startService(
 //                UsbService::class.java,
@@ -140,7 +140,7 @@ class TabActivity : AppCompatActivity() {
 
     }
 
-    fun viewInit(){
+    fun viewInit() {
         val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager, mode!!)
         val viewPager: CustomViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
@@ -168,14 +168,14 @@ class TabActivity : AppCompatActivity() {
         startbtn = findViewById(R.id.startbtn)
         startbtn.setOnClickListener {
             Log.d("TAG", "onCreate: " + startbtn.getDirection())
-            if(startbtn.getDirection().toString() == "RIGHT"){
+            if (startbtn.getDirection().toString() == "RIGHT") {
                 wheelChairStart()
-            }else if(startbtn.getDirection().toString() == "LEFT"){
+            } else if (startbtn.getDirection().toString() == "LEFT") {
                 wheelChairStop()
             }
         }
         txtDebugger.text = mode
-        if(mode == Constants.REMOTE){
+        if (mode == Constants.REMOTE) {
             handler = object : Handler(Looper.getMainLooper()) {
                 override fun handleMessage(msg: Message) {
                     Log.d("TAG", "handleMessage: " + msg.what)
@@ -212,13 +212,13 @@ class TabActivity : AppCompatActivity() {
             connectLay.visibility = View.GONE
             Log.d("TAG", "onCreate: " + bt_status)
 
-            if(bt_status){
+            if (bt_status) {
                 handler?.obtainMessage(CONNECTING_STATUS, 1, -1)?.sendToTarget()
                 connectedThread = ConnectedThread(BluetoothFragment.mmSocket!!, this)
-                    connectedThread?.start()
+                connectedThread!!.start()
             }
 
-        }else if(mode == Constants.DOCK){
+        } else if (mode == Constants.DOCK) {
 
             connectLay.visibility = View.GONE
             startService(
@@ -253,10 +253,11 @@ class TabActivity : AppCompatActivity() {
         filter.addAction(UsbService.ACTION_USB_PERMISSION_NOT_GRANTED)
         registerReceiver(mUsbReceiver, filter)
     }
-    fun remoteConnection(){
+
+    fun remoteConnection() {
         handler = object : Handler(Looper.getMainLooper()) {
             override fun handleMessage(msg: Message) {
-             
+
                 Log.d("TAG", "handleMessage: " + msg.what)
                 when (msg.what) {
                     CONNECTING_STATUS -> {
@@ -290,7 +291,7 @@ class TabActivity : AppCompatActivity() {
 
         connectLay.visibility = View.GONE
 
-        if(bt_status){
+        if (bt_status) {
             handler?.obtainMessage(CONNECTING_STATUS, 1, -1)?.sendToTarget();
             connectedThread = ConnectedThread(BluetoothFragment.mmSocket!!, this)
             connectedThread?.start()
@@ -320,8 +321,8 @@ class TabActivity : AppCompatActivity() {
         bindService(bindingIntent, serviceConnection, BIND_AUTO_CREATE)
     }
 
-    fun changeState(mode: String){
-        when(mode){
+    fun changeState(mode: String) {
+        when (mode) {
             "FWD" -> {
                 forward.visibility = View.GONE; reverse.visibility = View.VISIBLE;
             }
@@ -334,30 +335,30 @@ class TabActivity : AppCompatActivity() {
             "HOFF" -> {
                 headlights_off.visibility = View.GONE; headlights.visibility = View.VISIBLE;
             }
-            else->{
+            else -> {
                 forward.visibility = View.GONE; reverse.visibility = View.VISIBLE;
             }
         }
     }
 
-    fun wheelChairStart () {
-        try{
-            if(mode == Constants.DOCK){
+    fun wheelChairStart() {
+        try {
+            if (mode == Constants.DOCK) {
                 usbService?.write("1#0#0#0\n".toByteArray())
             }
-        }catch(e: Exception){
+        } catch (e: Exception) {
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
         }
 
         utilityLay.visibility = View.VISIBLE
     }
 
-    fun wheelChairStop(){
-        try{
-            if(mode == Constants.DOCK){
+    fun wheelChairStop() {
+        try {
+            if (mode == Constants.DOCK) {
                 usbService?.write("0#0#0#0\n".toByteArray())
             }
-        }catch(e: Exception){
+        } catch (e: Exception) {
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
         }
         utilityLay.visibility = View.GONE
@@ -384,11 +385,11 @@ class TabActivity : AppCompatActivity() {
         override fun handleMessage(msg: Message) {
             when (msg.what) {
                 UsbService.MESSAGE_FROM_SERIAL_PORT -> {
-                    try{
-                        activity.runOnUiThread{
+                    try {
+                        activity.runOnUiThread {
                             val data = msg.obj.toString()
                         }
-                    }catch (e: Exception){
+                    } catch (e: Exception) {
                         e.printStackTrace()
                     }
                 }
@@ -404,7 +405,8 @@ class TabActivity : AppCompatActivity() {
                 ).show()
                 UsbService.SYNC_READ -> {
                     val buffer = msg.obj as List<String>
-                    val stats = "${buffer[1].trim()} ${buffer[2].trim()} ${buffer[3].trim()} ${buffer[4].trim()}"
+                    val stats =
+                        "${buffer[1].trim()} ${buffer[2].trim()} ${buffer[3].trim()} ${buffer[4].trim()}"
                     activity.txtDebugger.text = stats
                     activity.modelViewModel!!.sendSerialData(buffer)
                 }
@@ -414,58 +416,80 @@ class TabActivity : AppCompatActivity() {
     }
 
 
-    companion object{
+    companion object {
 
-         const val CONNECTING_STATUS = 1 // used in bluetooth handler to identify message status
+        const val CONNECTING_STATUS = 1 // used in bluetooth handler to identify message status
 
         var USB_STATE = 3
 
-         const val MESSAGE_READ = 2 // used in bluetooth handler to identify message update
+        const val MESSAGE_READ = 2 // used in bluetooth handler to identify message update
 
         var handler: Handler? = null;
 
-        var connectedThread : ConnectedThread ?= null
+        var connectedThread: ConnectedThread? = null
 
         /* =============================== Thread for Data Transfer =========================================== */
-        class ConnectedThread(private val mmSocket: BluetoothSocket, private val activity: TabActivity) : Thread() {
+        class ConnectedThread(
+            private val mmSocket: BluetoothSocket,
+            private val activity: TabActivity
+        ) : Thread() {
             private val mmInStream: InputStream?
             private val mmOutStream: OutputStream?
-            var data2 = ""
-            private var input: BufferedReader? = null
+            var stringMaker = SerialStringMaker()
             override fun run() {
-                val buffer = ByteArray(1024) // buffer store for the stream
-                var bytes = 0 // bytes returned from read()
-                // Keep listening to the InputStream until an exception occurs
-
                 while (true) {
                     try {
-                        /*
-                        Read from the InputStream from Arduino until termination character is reached.
-                        Then send the whole String message to GUI Handler.
-                         */
+                        val buffer = ByteArray(128)
+                        var readMessage: String
+                        var bytes: Int
+                        if (mmInStream!!.available() > 0) {
+                            try {
+                                // Read from the InputStream
+                                bytes = mmInStream!!.read(buffer)
+                                readMessage = String(buffer, 0, bytes)
+                                val finalString = stringMaker.makeString(readMessage, 8, "#", ",")
+                                if (finalString != null) {
+                                    Log.d("bt_read", finalString.toString())
+                                    activity.runOnUiThread {
+                                        activity.txtDebugger.text = finalString.toString()
+                                    }
+                                }
 
-                        var readMessage: String = ""
-                        var receiving = true
-                        while(receiving){
-                            var value = mmInStream?.read()?.toChar()!!
-                            Log.d("value", value.toString())
-                            if(value.toString() == "#"){
-                                receiving = false
+                            } catch (e: IOException) {
+                                Log.e("err", "disconnected", e)
                                 break
-                            }else readMessage+=value
+                            }
+                            // Send the obtained bytes to the UI Activity
                         }
-
-                        val buffer = readMessage.split(",")
-                        val stats = "${buffer[1].trim()} ${buffer[2].trim()} ${buffer[3].trim()} ${buffer[4].trim()}"
-                        activity.txtDebugger.text = stats
-                        activity.modelViewModel!!.sendSerialData(buffer)
-                        Log.d("Messa", readMessage.split(",").toString())
-
-
                     } catch (e: IOException) {
                         e.printStackTrace()
-                        break
                     }
+//                    try {
+//                        /*
+//                        Read from the InputStream from Arduino until termination character is reached.
+//                        Then send the whole String message to GUI Handler.
+//                         */
+//
+//                        var readMessage: String = ""
+//                        var receiving = true
+//                        while(receiving){
+//                            var value = mmInStream!!.read().toChar()!!
+//                            if(value.toString() == "#"){
+//                                receiving = false
+//                                break
+//                            }else readMessage+=value
+//                        }
+//                        activity.runOnUiThread {
+//                            activity.txtDebugger.text = readMessage
+//                        }
+////                        activity.modelViewModel!!.sendSerialData(readMessage)
+//                        Log.d("bluetooth_thread_read", readMessage)
+//
+//
+//                    } catch (e: IOException) {
+//                        e.printStackTrace()
+//                        break
+//                    }
                 }
             }
 
@@ -474,6 +498,7 @@ class TabActivity : AppCompatActivity() {
                 try {
                     val bytes = input.toByteArray() //converts entered String into bytes
                     mmOutStream?.write(bytes)
+                    Log.d("bluetooth_thread_write", bytes.toString())
                 } catch (e: IOException) {
                     Log.e("Send Error", "Unable to send message", e)
                 }
