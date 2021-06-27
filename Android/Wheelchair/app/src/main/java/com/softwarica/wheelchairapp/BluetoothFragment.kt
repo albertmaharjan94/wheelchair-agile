@@ -91,7 +91,7 @@ class BluetoothFragment : BottomSheetDialogFragment() {
         }
 
 
-        if (!mBluetoothAdapter.isEnabled())
+        if (!mBluetoothAdapter.isEnabled)
             mBluetoothAdapter.enable();
 
 
@@ -99,12 +99,12 @@ class BluetoothFragment : BottomSheetDialogFragment() {
         var bt = mBluetoothAdapter.bondedDevices
 
         if(bt.size > 0){
-           bt.forEach({
+           bt.forEach {
                if (mPairedAddressList.indexOf(it.address) == -1) {
                    mPairedDeviceList.add(it.name)
                    mPairedAddressList.add(it.address)
                }
-           })
+           }
         }
 
         pairedDevices.layoutManager = LinearLayoutManager(requireContext())
