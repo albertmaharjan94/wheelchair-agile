@@ -1,5 +1,6 @@
 package com.softwarica.wheelchairapp
 
+import android.app.Activity
 import android.bluetooth.BluetoothSocket
 import android.content.*
 import android.location.LocationManager
@@ -213,7 +214,7 @@ class TabActivity : AppCompatActivity() {
 
             if(bt_status){
                 handler?.obtainMessage(CONNECTING_STATUS, 1, -1)?.sendToTarget()
-                connectedThread = ConnectedThread(BluetoothFragment.mmSocket!!)
+                connectedThread = ConnectedThread(BluetoothFragment.mmSocket!!, this)
                     connectedThread?.start()
             }
 
@@ -291,7 +292,7 @@ class TabActivity : AppCompatActivity() {
 
         if(bt_status){
             handler?.obtainMessage(CONNECTING_STATUS, 1, -1)?.sendToTarget();
-            connectedThread = ConnectedThread(BluetoothFragment.mmSocket!!)
+            connectedThread = ConnectedThread(BluetoothFragment.mmSocket!!, this)
             connectedThread?.start()
         }
 
@@ -426,7 +427,7 @@ class TabActivity : AppCompatActivity() {
         var connectedThread : ConnectedThread ?= null
 
         /* =============================== Thread for Data Transfer =========================================== */
-        class ConnectedThread(private val mmSocket: BluetoothSocket) : Thread() {
+        class ConnectedThread(private val mmSocket: BluetoothSocket, private val activity: TabActivity) : Thread() {
             private val mmInStream: InputStream?
             private val mmOutStream: OutputStream?
             var data2 = ""
@@ -454,6 +455,10 @@ class TabActivity : AppCompatActivity() {
                             }else readMessage+=value
                         }
 
+                        val buffer = readMessage.split(",")
+                        val stats = "${buffer[1].trim()} ${buffer[2].trim()} ${buffer[3].trim()} ${buffer[4].trim()}"
+                        activity.txtDebugger.text = stats
+                        activity.modelViewModel!!.sendSerialData(buffer)
                         Log.d("Messa", readMessage.split(",").toString())
 
 

@@ -1,6 +1,7 @@
 package com.softwarica.wheelchairapp
 
 import android.Manifest
+import android.app.Dialog
 import android.app.ProgressDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -26,6 +27,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.snackbar.Snackbar
 import com.softwarica.wheelchairapp.Utils.Constants
 import com.softwarica.wheelchairapp.adapters.DeviceListAdapter
 import com.softwarica.wheelchairapp.adapters.PairedDeviceListAdapter
@@ -130,7 +132,18 @@ class BluetoothFragment : BottomSheetDialogFragment() {
             override fun handleMessage(msg: Message) {
                 when(msg.what){
                     LOADING_DIALOG -> {
-                        ProgressDialog.show(context, "Bluetooth Connection", "Connecting... Please Wait")
+                        val progress: ProgressDialog = ProgressDialog(requireContext())
+                        progress.setTitle("Bluetooth Connection");
+                        progress.setMessage("Please wait while we connect to devices...");
+                        progress.show()
+
+                        val progressRunnable = Runnable {
+                            progress.cancel()
+                            Toast.makeText(requireContext(), "Bluetooth device not connected. Please try again.", Toast.LENGTH_LONG).show()
+                        }
+
+                        val pdCanceller = Handler()
+                        pdCanceller.postDelayed(progressRunnable, 5000)
                     }
                 }
             }
