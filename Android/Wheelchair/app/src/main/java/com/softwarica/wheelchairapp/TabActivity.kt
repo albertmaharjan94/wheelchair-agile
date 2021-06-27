@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.tabs.TabLayout
 import com.softwarica.wheelchairapp.Utils.Constants
-import com.softwarica.wheelchairapp.Utils.SerialStringMaker
 import com.softwarica.wheelchairapp.ViewPager.CustomViewPager
 import com.softwarica.wheelchairapp.services.UsbService
 import com.softwarica.wheelchairapp.ui.main.Dash.ModelViewModel
@@ -435,26 +434,30 @@ class TabActivity : AppCompatActivity() {
         ) : Thread() {
             private val mmInStream: InputStream?
             private val mmOutStream: OutputStream?
-            var stringMaker = SerialStringMaker()
+            var data2 = ""
+            private var input: BufferedReader? = null
             override fun run() {
+                ByteArray(1024) // buffer store for the stream
+                var bytes = 0 // bytes returned from read()
+                // Keep listening to the InputStream until an exception occurs
                 while (true) {
                     try {
                         val buffer = ByteArray(128)
                         var readMessage: String
                         var bytes: Int
-                        if (mmInStream!!.available() > 0) {
+                        if (mmInStream!!.available() > 2) {
                             try {
                                 // Read from the InputStream
                                 bytes = mmInStream!!.read(buffer)
                                 readMessage = String(buffer, 0, bytes)
-                                val finalString = stringMaker.makeString(readMessage, 8, "#", ",")
-                                if (finalString != null) {
-                                    Log.d("bt_read", finalString.toString())
-                                    activity.runOnUiThread {
-                                        activity.txtDebugger.text = finalString.toString()
+                                val split = readMessage.split("#")
+                                if (split.isNotEmpty()) {
+                                    val commaSplit = split[split.size - 1].split(",")
+
+                                    if (commaSplit.size >= 8) {
+                                        Log.d("bt_read", commaSplit.toString())
                                     }
                                 }
-
                             } catch (e: IOException) {
                                 Log.e("err", "disconnected", e)
                                 break
