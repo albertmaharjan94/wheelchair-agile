@@ -98,7 +98,7 @@ class UsbService : Service() {
                     if (split.isNotEmpty()) {
                         val commaSplit = split[split.size - 1].split(",")
 
-                        if (commaSplit.size > 5 && mHandler != null) {
+                        if (commaSplit.size >= 8 && mHandler != null) {
                             mHandler!!.obtainMessage(SYNC_READ, commaSplit).sendToTarget()
                         }
 

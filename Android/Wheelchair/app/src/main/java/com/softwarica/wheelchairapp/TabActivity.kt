@@ -19,13 +19,13 @@ import java.io.*
 
 
 class TabActivity : AppCompatActivity() {
-    private lateinit var startbtn: StickySwitch;
-    private lateinit var reverse: ImageButton;
-    private lateinit var forward: ImageButton;
-    private lateinit var headlights: ImageButton;
-    private lateinit var headlights_off: ImageButton;
-    private lateinit var connectLay: RelativeLayout;
-    private lateinit var utilityLay: LinearLayout;
+    private lateinit var startbtn: StickySwitch
+    private lateinit var reverse: ImageButton
+    private lateinit var forward: ImageButton
+    private lateinit var headlights: ImageButton
+    private lateinit var headlights_off: ImageButton
+    private lateinit var connectLay: RelativeLayout
+    private lateinit var utilityLay: LinearLayout
     private lateinit var conntxt: TextView
     private lateinit var txtDebugger: TextView
     private var bt_status = false
@@ -36,6 +36,13 @@ class TabActivity : AppCompatActivity() {
 
     private var usbService: UsbService? = null
     private val uHandler = UsbHandler(this)
+
+
+//   arduino values
+    var _key = 0
+    var _brake = 1
+    var _reverse = 0
+    var _speed_1 = 0
 
     private val usbConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(arg0: ComponentName, arg1: IBinder) {
@@ -97,7 +104,7 @@ class TabActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         mode = intent.getStringExtra(Constants.MODE)!!
-        bt_status = intent.getBooleanExtra(Constants.BT_STATUS, false);
+        bt_status = intent.getBooleanExtra(Constants.BT_STATUS, false)
         if (mode == Constants.DOCK) {
             setFilters() // Start listening notifications from UsbService
 
@@ -323,10 +330,15 @@ class TabActivity : AppCompatActivity() {
     fun changeState(mode: String) {
         when (mode) {
             "FWD" -> {
-                forward.visibility = View.GONE; reverse.visibility = View.VISIBLE;
+                forward.visibility = View.GONE
+                reverse.visibility = View.VISIBLE
+                _reverse = 0
+                writeToArduino()
             }
             "REV" -> {
                 forward.visibility = View.VISIBLE; reverse.visibility = View.GONE;
+                _reverse = 1
+                writeToArduino()
             }
             "HDON" -> {
                 headlights_off.visibility = View.VISIBLE; headlights.visibility = View.GONE;
@@ -340,26 +352,32 @@ class TabActivity : AppCompatActivity() {
         }
     }
 
-    fun wheelChairStart() {
+    private fun writeToArduino(){
         try {
+            val out = "$_key#$_brake#$_reverse#$_speed_1\n"
             if (mode == Constants.DOCK) {
-                usbService?.write("1#0#0#0\n".toByteArray())
+                usbService?.write(out.toByteArray())
+            }
+            if(mode == Constants.REMOTE){
+                connectedThread?.write(out)
             }
         } catch (e: Exception) {
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
         }
+    }
 
+    private fun wheelChairStart() {
+        _key = 1
+        _brake = 0
+        writeToArduino()
         utilityLay.visibility = View.VISIBLE
     }
 
     fun wheelChairStop() {
-        try {
-            if (mode == Constants.DOCK) {
-                usbService?.write("0#0#0#0\n".toByteArray())
-            }
-        } catch (e: Exception) {
-            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
-        }
+        _key = 0
+        _brake = 1
+        writeToArduino()
+
         utilityLay.visibility = View.GONE
         forward.visibility = View.GONE
         headlights_off.visibility = View.GONE
@@ -434,12 +452,10 @@ class TabActivity : AppCompatActivity() {
         ) : Thread() {
             private val mmInStream: InputStream?
             private val mmOutStream: OutputStream?
-            var data2 = ""
             private var input: BufferedReader? = null
             override fun run() {
                 ByteArray(1024) // buffer store for the stream
-                var bytes = 0 // bytes returned from read()
-                // Keep listening to the InputStream until an exception occurs
+                // Keep listening to the InputStream until an exception occursZ
                 while (true) {
                     try {
                         val buffer = ByteArray(128)
@@ -454,7 +470,7 @@ class TabActivity : AppCompatActivity() {
                                 if (split.isNotEmpty()) {
                                     val commaSplit = split[split.size - 1].split(",")
 
-                                    if (commaSplit.size >= 8) {
+                                    if (commaSplit.size >= 6) {
                                         Log.d("bt_read", commaSplit.toString())
                                     }
                                 }

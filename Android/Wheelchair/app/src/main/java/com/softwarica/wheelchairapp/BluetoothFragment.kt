@@ -1,7 +1,7 @@
 package com.softwarica.wheelchairapp
 
 import android.Manifest
-import android.app.Dialog
+import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -27,7 +27,6 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.Snackbar
 import com.softwarica.wheelchairapp.Utils.Constants
 import com.softwarica.wheelchairapp.adapters.DeviceListAdapter
 import com.softwarica.wheelchairapp.adapters.PairedDeviceListAdapter
@@ -98,7 +97,7 @@ class BluetoothFragment : BottomSheetDialogFragment() {
             mBluetoothAdapter.enable();
 
 
-        mBluetoothAdapter.startDiscovery();
+        mBluetoothAdapter.startDiscovery()
         var bt = mBluetoothAdapter.bondedDevices
 
         if (bt.size > 0) {
@@ -221,6 +220,8 @@ class BluetoothFragment : BottomSheetDialogFragment() {
         private var mBTList = ArrayList<BluetoothDevice>()
         var mmSocket: BluetoothSocket? = null
         private var LOADING_DIALOG = 1
+
+//        private var SAVE_DIALOG = 1
 
         fun pairDevice(position: Int) {
 
