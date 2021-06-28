@@ -44,6 +44,7 @@ class BluetoothFragment : BottomSheetDialogFragment() {
     private lateinit var loading: ProgressBar
     private lateinit var listLay: LinearLayout
     private lateinit var pairedDevices: RecyclerView
+    private var progress: ProgressDialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,6 +57,7 @@ class BluetoothFragment : BottomSheetDialogFragment() {
         loading = root.findViewById(R.id.loading)
         listLay = root.findViewById(R.id.listLay)
         pairedDevices = root.findViewById(R.id.pairedDevices)
+        progress = ProgressDialog(requireContext())
 
         val permission1 = ContextCompat.checkSelfPermission(
             requireContext(),
@@ -131,11 +133,27 @@ class BluetoothFragment : BottomSheetDialogFragment() {
             override fun handleMessage(msg: Message) {
                 when (msg.what) {
                     LOADING_DIALOG -> {
-                        val progress: ProgressDialog = ProgressDialog(requireContext())
-                        progress.setTitle("Bluetooth Connection");
-                        progress.setMessage("Please wait while we connect to devices...");
-                        progress.show()
+//                        progress.
+                        if(progress!=null){
+                            progress!!.setTitle("Bluetooth Connection");
+                            progress!!.setMessage("Please wait while we connect to devices...");
+                            progress!!.show()
+                        }
                     }
+                    CLOSE_LOADING_DIALOG -> {
+                        if(progress!=null){
+                            progress!!.dismiss()
+                        }
+                        AlertDialog.Builder(requireContext())
+                        .setTitle("Connection Error")
+                        .setMessage("Make sure bluetooth devices are connected")
+                        .setPositiveButton("Yes") { dialog, id ->
+                            dialog.dismiss()
+                        }
+                        .show()
+
+                    }
+
                 }
             }
         }
@@ -220,13 +238,14 @@ class BluetoothFragment : BottomSheetDialogFragment() {
         private var mBTList = ArrayList<BluetoothDevice>()
         var mmSocket: BluetoothSocket? = null
         private var LOADING_DIALOG = 1
+        private var CLOSE_LOADING_DIALOG = 2
 
 //        private var SAVE_DIALOG = 1
 
         fun pairDevice(position: Int) {
 
             if (position != null) {
-                mBTList.get(position).createBond();
+                mBTList[position].createBond();
             }
         }
 
@@ -275,6 +294,7 @@ class BluetoothFragment : BottomSheetDialogFragment() {
                     // Unable to connect; close the socket and return.
                     try {
                         mmSocket!!.close()
+                        mHandler?.obtainMessage(CLOSE_LOADING_DIALOG)?.sendToTarget()
                         Log.e("TAG", "run: " + connectException.message)
                         Log.e("Status", "Cannot connect to device")
                     } catch (closeException: IOException) {
