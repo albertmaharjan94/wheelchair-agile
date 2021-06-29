@@ -98,10 +98,8 @@ class BluetoothFragment : BottomSheetDialogFragment() {
         if (!mBluetoothAdapter.isEnabled)
             mBluetoothAdapter.enable();
 
-
-        mBluetoothAdapter.startDiscovery()
         var bt = mBluetoothAdapter.bondedDevices
-
+        Log.d("BT", bt.toString())
         if (bt.size > 0) {
             bt.forEach {
                 if (mPairedAddressList.indexOf(it.address) == -1) {
@@ -117,6 +115,13 @@ class BluetoothFragment : BottomSheetDialogFragment() {
             mPairedAddressList,
             requireContext()
         )
+
+
+//        loading.visibility = View.GONE
+        listLay.visibility = View.VISIBLE
+
+        mBluetoothAdapter.startDiscovery()
+       
 
 
         var filter = IntentFilter()
@@ -147,7 +152,7 @@ class BluetoothFragment : BottomSheetDialogFragment() {
                         AlertDialog.Builder(requireContext())
                         .setTitle("Connection Error")
                         .setMessage("Make sure bluetooth devices are connected")
-                        .setPositiveButton("Yes") { dialog, id ->
+                        .setPositiveButton("Okay") { dialog, id ->
                             dialog.dismiss()
                         }
                         .show()
