@@ -58,6 +58,7 @@ class BluetoothFragment : BottomSheetDialogFragment() {
         listLay = root.findViewById(R.id.listLay)
         pairedDevices = root.findViewById(R.id.pairedDevices)
         progress = ProgressDialog(requireContext())
+        progress?.setCancelable(false)
 
         val permission1 = ContextCompat.checkSelfPermission(
             requireContext(),
@@ -121,7 +122,6 @@ class BluetoothFragment : BottomSheetDialogFragment() {
         listLay.visibility = View.VISIBLE
 
         mBluetoothAdapter.startDiscovery()
-       
 
 
         var filter = IntentFilter()
@@ -139,23 +139,23 @@ class BluetoothFragment : BottomSheetDialogFragment() {
                 when (msg.what) {
                     LOADING_DIALOG -> {
 //                        progress.
-                        if(progress!=null){
+                        if (progress != null) {
                             progress!!.setTitle("Bluetooth Connection");
                             progress!!.setMessage("Please wait while we connect to devices...");
                             progress!!.show()
                         }
                     }
                     CLOSE_LOADING_DIALOG -> {
-                        if(progress!=null){
+                        if (progress != null) {
                             progress!!.dismiss()
                         }
                         AlertDialog.Builder(requireContext())
-                        .setTitle("Connection Error")
-                        .setMessage("Make sure bluetooth devices are connected")
-                        .setPositiveButton("Okay") { dialog, id ->
-                            dialog.dismiss()
-                        }
-                        .show()
+                            .setTitle("Connection Error")
+                            .setMessage("Make sure bluetooth devices are connected")
+                            .setPositiveButton("Okay") { dialog, id ->
+                                dialog.dismiss()
+                            }
+                            .show()
 
                     }
 
@@ -242,8 +242,9 @@ class BluetoothFragment : BottomSheetDialogFragment() {
         private var mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         private var mBTList = ArrayList<BluetoothDevice>()
         var mmSocket: BluetoothSocket? = null
-        private var LOADING_DIALOG = 1
-        private var CLOSE_LOADING_DIALOG = 2
+        var LOADING_DIALOG = 1
+        var CLOSE_LOADING_DIALOG = 2
+        var current_address = ""
 
 //        private var SAVE_DIALOG = 1
 
@@ -254,7 +255,11 @@ class BluetoothFragment : BottomSheetDialogFragment() {
             }
         }
 
-        class CreateConnectionThread(private val context: Context, address: String) : Thread() {
+        class CreateConnectionThread(
+            private val context: Context,
+            address: String,
+            val new: Boolean = true
+        ) : Thread() {
             var bluetoothDevice: BluetoothDevice = mBluetoothAdapter.getRemoteDevice(address)
             var tmp: BluetoothSocket? = null
             var uuid: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
@@ -268,12 +273,16 @@ class BluetoothFragment : BottomSheetDialogFragment() {
                     You should try using other methods i.e. :
                     tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
                      */
+                    if (!new) {
+                        mmSocket?.close()
+                    }
+                    current_address = address
                     tmp = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid);
 
                 } catch (e: IOException) {
                     print(e.printStackTrace())
                 }
-
+                Log.e("mmsocket", mmSocket.toString())
                 mmSocket = tmp;
             }
 
@@ -283,18 +292,17 @@ class BluetoothFragment : BottomSheetDialogFragment() {
                 try {
                     // Connect to the remote device through the socket. This call blocks
                     // until it succeeds or throws an exception.
-
                     mHandler?.obtainMessage(LOADING_DIALOG)?.sendToTarget()
                     mmSocket!!.connect()
 
                     Log.e("Status", "Device connected")
+                    if (new) {
+                        var intent = Intent(context, TabActivity::class.java)
+                        intent.putExtra(Constants.MODE, Constants.REMOTE)
+                        intent.putExtra(Constants.BT_STATUS, Constants.CONNECTED)
 
-                    var intent = Intent(context, TabActivity::class.java)
-                    intent.putExtra(Constants.MODE, Constants.REMOTE)
-                    intent.putExtra(Constants.BT_STATUS, Constants.CONNECTED)
-
-                    ContextCompat.startActivity(context!!, intent, null)
-
+                        ContextCompat.startActivity(context!!, intent, null)
+                    }
                 } catch (connectException: IOException) {
                     // Unable to connect; close the socket and return.
                     try {

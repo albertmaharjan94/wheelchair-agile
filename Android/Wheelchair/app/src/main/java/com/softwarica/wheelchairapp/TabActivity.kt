@@ -1,16 +1,22 @@
 package com.softwarica.wheelchairapp
 
+import android.app.ProgressDialog
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.*
 import android.os.*
 import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
 import com.softwarica.wheelchairapp.Utils.Constants
 import com.softwarica.wheelchairapp.ViewPager.CustomViewPager
+import com.softwarica.wheelchairapp.adapters.DeviceListAdapter
 import com.softwarica.wheelchairapp.services.UsbService
 import com.softwarica.wheelchairapp.ui.main.Dash.ModelViewModel
 import com.softwarica.wheelchairapp.ui.main.SectionsPagerAdapter
@@ -31,14 +37,14 @@ class TabActivity : AppCompatActivity() {
     private var bt_status = false
     private var modelViewModel: ModelViewModel? = null
 
-
     var mode: String? = null
-
+    var progress: ProgressDialog? = null
     private var usbService: UsbService? = null
     private val uHandler = UsbHandler(this)
+    private val bHandler = BluetoothHandler(this)
 
 
-//   arduino values
+    //   arduino values
     var _key = 0
     var _brake = 1
     var _reverse = 0
@@ -114,6 +120,8 @@ class TabActivity : AppCompatActivity() {
                 usbConnection,
                 null
             )
+        } else {
+            setBtFilters()
         }
     }
 
@@ -125,25 +133,114 @@ class TabActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(mReceiver)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tab)
         mode = intent.getStringExtra(Constants.MODE)
         bt_status = intent.getBooleanExtra(Constants.BT_STATUS, false)
+        progress = ProgressDialog(this@TabActivity)
+        progress?.setCancelable(false)
         viewInit()
 
 
         if (mode == Constants.REMOTE) {
-            remoteConnection()
+            remoteConn()
         } else if (mode == Constants.DOCK) {
-//            setFilters()
-//              startService(
-//                UsbService::class.java,
-//                usbConnection,
-//                null
-//            )
+            usbConn()
         }
 
+    }
+
+    private fun usbConn() {
+        connectLay.visibility = View.GONE
+        startService(
+            UsbService::class.java,
+            usbConnection,
+            null
+        )
+    }
+
+    var mReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            val action = intent.action
+            Log.e("BTACTION", action.toString())
+            if (action == BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED) {
+                conntxt.text = "Disconnecting"
+                progress!!.setTitle("Bluetooth Disconnecting");
+                progress!!.setMessage("Bluetooth device is disconnecting")
+                progress!!.show()
+            }
+            if (action == BluetoothDevice.ACTION_ACL_DISCONNECTED) {
+                progress?.dismiss()
+                conntxt.text = "Disconnected"
+                bt_status = false
+                wheelChairStop()
+                startbtn.setDirection(StickySwitch.Direction.LEFT)
+                viewReconBT()
+            }
+            if (action == BluetoothDevice.ACTION_ACL_CONNECTED) {
+                progress?.dismiss()
+                conntxt.text = "Connected"
+                bt_status = true
+            }
+        }
+    }
+    var alert_pending = false
+    fun viewReconBT() {
+        if(!alert_pending){
+            alert_pending = true
+            AlertDialog.Builder(this@TabActivity)
+                .setTitle("Bluetooth disconnected")
+                .setCancelable(false)
+                .setMessage("Do you want to connect again?")
+                .setPositiveButton("Yes") { dialog, id ->
+//                        start connection thread again
+                    try {
+
+                        progress!!.setTitle("Bluetooth Connection");
+                        progress!!.setMessage("Please wait while we connect to devices...")
+                        progress!!.show()
+
+                        closeThreads()
+                        BluetoothFragment.Companion.CreateConnectionThread(
+                            this,
+                            BluetoothFragment.current_address,
+                            false
+                        ).start()
+                        SystemClock.sleep(500)
+
+                        connectedThread = ConnectedThread(BluetoothFragment.mmSocket!!, this, bHandler)
+                        connectedThread?.start()
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            this@TabActivity,
+                            "Connection Error. Please try again",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        e.printStackTrace()
+                    }
+                    dialog.dismiss()
+                    alert_pending = false
+                }
+                .setNegativeButton("No") { dialog, id ->
+                    dialog.dismiss()
+                    alert_pending = false
+                }
+                .show()
+        }
+
+    }
+
+    private fun closeThreads() {
+        connectedThread?.cancel()
+        connectedThread = null
+        BluetoothFragment.mmSocket?.close()
+        BluetoothFragment.mmSocket = null
     }
 
     fun viewInit() {
@@ -174,65 +271,20 @@ class TabActivity : AppCompatActivity() {
         startbtn = findViewById(R.id.startbtn)
         startbtn.setOnClickListener {
             Log.d("TAG", "onCreate: " + startbtn.getDirection())
-            if (startbtn.getDirection().toString() == "RIGHT") {
-                wheelChairStart()
-            } else if (startbtn.getDirection().toString() == "LEFT") {
-                wheelChairStop()
-            }
-        }
-        txtDebugger.text = mode
-        if (mode == Constants.REMOTE) {
-            handler = object : Handler(Looper.getMainLooper()) {
-                override fun handleMessage(msg: Message) {
-                    Log.d("TAG", "handleMessage: " + msg.what)
-                    when (msg.what) {
-                        CONNECTING_STATUS -> {
-
-                            when (msg.arg1) {
-                                1 -> {
-                                    conntxt.text = "Connected"
-                                }
-                                -1 -> {
-                                    conntxt.text = "Not Connected"
-                                }
-                                else -> {
-                                    conntxt.text = "asd"
-                                }
-                            }
-                        }
-                        MESSAGE_READ -> {
-                            val arduinoMsg: String = msg.obj.toString() // Read message from Arduino
-                            when (arduinoMsg.toLowerCase()) {
-                                "led is turned on" -> {
-
-                                }
-                                "led is turned off" -> {
-
-                                }
-                            }
-                        }
-                    }
+            if(!bt_status && mode == Constants.REMOTE){
+                startbtn.setDirection(StickySwitch.Direction.LEFT)
+                bHandler.obtainMessage(101).sendToTarget()
+            }else{
+                if (startbtn.getDirection().toString() == "RIGHT") {
+                    wheelChairStart()
+                } else if (startbtn.getDirection().toString() == "LEFT") {
+                    wheelChairStop()
                 }
             }
 
-            connectLay.visibility = View.GONE
-            Log.d("TAG", "onCreate: " + bt_status)
 
-            if (bt_status) {
-                handler?.obtainMessage(CONNECTING_STATUS, 1, -1)?.sendToTarget()
-                connectedThread = ConnectedThread(BluetoothFragment.mmSocket!!, this)
-                connectedThread!!.start()
-            }
-
-        } else if (mode == Constants.DOCK) {
-
-            connectLay.visibility = View.GONE
-            startService(
-                UsbService::class.java,
-                usbConnection,
-                null
-            )
         }
+        txtDebugger.text = mode
 
         reverse.setOnClickListener {
             changeState("REV")
@@ -249,6 +301,14 @@ class TabActivity : AppCompatActivity() {
 
     }
 
+    private fun setBtFilters() {
+        val filter = IntentFilter()
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED)
+        registerReceiver(mReceiver, filter)
+    }
+
 
     private fun setFilters() {
         val filter = IntentFilter()
@@ -260,46 +320,75 @@ class TabActivity : AppCompatActivity() {
         registerReceiver(mUsbReceiver, filter)
     }
 
-    fun remoteConnection() {
-        handler = object : Handler(Looper.getMainLooper()) {
+    fun remoteConn() {
+//        handler = object : Handler(Looper.getMainLooper()) {
+//            override fun handleMessage(msg: Message) {
+//
+//                Log.d("TAG", "handleMessage: " + msg.what)
+//                when (msg.what) {
+//                    CONNECTING_STATUS -> {
+//                        when (msg.arg1) {
+//                            1 -> {
+//                                conntxt.text = "Connected"
+//
+//                            }
+//                            -1 -> {
+//                                conntxt.text = "Not Connected"
+//                            }
+//                            else -> {
+//                                conntxt.text = "Network Error"
+//                            }
+//                        }
+//                    }
+//                    MESSAGE_READ -> {
+//                        val arduinoMsg: String = msg.obj.toString() // Read message from Arduino
+//                        when (arduinoMsg.toLowerCase()) {
+//                            "led is turned on" -> {
+//                            }
+//                            "led is turned off" -> {
+//
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+        connectLay.visibility = View.GONE
+        BluetoothFragment.mHandler = object : Handler(Looper.getMainLooper()) {
             override fun handleMessage(msg: Message) {
-
-                Log.d("TAG", "handleMessage: " + msg.what)
                 when (msg.what) {
-                    CONNECTING_STATUS -> {
-
-                        when (msg.arg1) {
-                            1 -> {
-                                conntxt.text = "Connected"
-
-                            }
-                            -1 -> {
-                                conntxt.text = "Not Connected"
-                            }
-                            else -> {
-                                conntxt.text = "Network Error"
-                            }
+//                    BluetoothFragment.LOADING_DIALOG -> {
+////                        progress.
+//                        if (progress != null) {
+//                            progress!!.setTitle("Bluetooth Connection");
+//                            progress!!.setMessage("Please wait while we connect to devices...");
+//                            progress!!.show()
+//                        }
+//                    }
+                    BluetoothFragment.CLOSE_LOADING_DIALOG -> {
+                        if (progress != null) {
+                            progress!!.dismiss()
                         }
-                    }
-                    MESSAGE_READ -> {
-                        val arduinoMsg: String = msg.obj.toString() // Read message from Arduino
-                        when (arduinoMsg.toLowerCase()) {
-                            "led is turned on" -> {
+                        closeThreads()
+                        bt_status = false
+                        AlertDialog.Builder(this@TabActivity)
+                            .setTitle("Connection Error")
+                            .setMessage("Make sure bluetooth devices are connected")
+                            .setPositiveButton("Okay") { dialog, id ->
+                                dialog.dismiss()
                             }
-                            "led is turned off" -> {
+                            .show()
 
-                            }
-                        }
                     }
+
                 }
             }
         }
-
-        connectLay.visibility = View.GONE
-
         if (bt_status) {
-            handler?.obtainMessage(CONNECTING_STATUS, 1, -1)?.sendToTarget();
-            connectedThread = ConnectedThread(BluetoothFragment.mmSocket!!, this)
+//            handler?.obtainMessage(CONNECTING_STATUS, 1, -1)?.sendToTarget();
+            conntxt.text = "Connected"
+            connectedThread = ConnectedThread(BluetoothFragment.mmSocket!!, this, bHandler)
             connectedThread?.start()
         }
 
@@ -352,13 +441,13 @@ class TabActivity : AppCompatActivity() {
         }
     }
 
-    private fun writeToArduino(){
+    private fun writeToArduino() {
         try {
             val out = "$_key#$_brake#$_reverse#$_speed_1\n"
             if (mode == Constants.DOCK) {
                 usbService?.write(out.toByteArray())
             }
-            if(mode == Constants.REMOTE){
+            if (mode == Constants.REMOTE) {
                 connectedThread?.write(out)
             }
         } catch (e: Exception) {
@@ -375,9 +464,9 @@ class TabActivity : AppCompatActivity() {
 
     fun wheelChairStop() {
         _key = 0
+        _reverse = 0
         _brake = 1
         writeToArduino()
-
         utilityLay.visibility = View.GONE
         forward.visibility = View.GONE
         headlights_off.visibility = View.GONE
@@ -432,6 +521,34 @@ class TabActivity : AppCompatActivity() {
 
     }
 
+    inner class BluetoothHandler(val activity: TabActivity) : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            Log.e("btHandler", msg.toString())
+            when (msg.what) {
+                100 -> {
+                    try {
+                        activity.runOnUiThread {
+                            val data = msg.obj.toString()
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                101 -> {
+                    if (!bt_status) {
+                        viewReconBT()
+                    }
+                }
+                102 -> Toast.makeText(
+                    activity,
+                    "DSR_CHANGE",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+
+    }
+
 
     companion object {
 
@@ -448,15 +565,17 @@ class TabActivity : AppCompatActivity() {
         /* =============================== Thread for Data Transfer =========================================== */
         class ConnectedThread(
             private val mmSocket: BluetoothSocket,
-            private val activity: TabActivity
+            private val activity: TabActivity,
+            private val bHandler: BluetoothHandler
         ) : Thread() {
-            private val mmInStream: InputStream?
-            private val mmOutStream: OutputStream?
+            private var mmInStream: InputStream?
+            private var mmOutStream: OutputStream?
             private var input: BufferedReader? = null
+            var running = true
             override fun run() {
                 ByteArray(1024) // buffer store for the stream
                 // Keep listening to the InputStream until an exception occursZ
-                while (true) {
+                while (running) {
                     try {
                         val buffer = ByteArray(128)
                         var readMessage: String
@@ -519,6 +638,7 @@ class TabActivity : AppCompatActivity() {
                     mmOutStream?.write(bytes)
                     Log.d("bluetooth_thread_write", bytes.toString())
                 } catch (e: IOException) {
+                    bHandler.obtainMessage(101).sendToTarget()
                     Log.e("Send Error", "Unable to send message", e)
                 }
             }
@@ -526,7 +646,11 @@ class TabActivity : AppCompatActivity() {
             /* Call this from the main activity to shutdown the connection */
             fun cancel() {
                 try {
+                    running = false
+                    mmInStream = null
+                    mmOutStream = null
                     mmSocket.close()
+
                 } catch (e: IOException) {
                 }
             }
@@ -541,6 +665,7 @@ class TabActivity : AppCompatActivity() {
                     tmpIn = mmSocket.inputStream
                     tmpOut = mmSocket.outputStream
                 } catch (e: IOException) {
+                    Log.e("StreamErr", "Socket stream")
                 }
                 mmInStream = tmpIn
                 mmOutStream = tmpOut

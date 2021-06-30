@@ -44,9 +44,10 @@ class PairedDeviceListAdapter(private val dataSet: ArrayList<String>,private val
         // contents of the view with that element
         Log.d("TAG", "onBindViewHolder: " + dataSet[position])
         viewHolder.textView.text = dataSet[position]
-        viewHolder.lay.setOnClickListener({
-            BluetoothFragment.Companion.CreateConnectionThread(context, addressSet.get(position)).start()
-        })
+        viewHolder.lay.setOnClickListener {
+            BluetoothFragment.Companion.CreateConnectionThread(context, addressSet[position])
+                .start()
+        }
     }
 
     // Return the size of your dataset (invoked by the layout manager)
