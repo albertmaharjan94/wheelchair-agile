@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import com.softwarica.wheelchairapp.OptionScreenActivity
 import com.softwarica.wheelchairapp.R
 import com.softwarica.wheelchairapp.Utils.Validator
 import com.softwarica.wheelchairapp.network.model.User
@@ -82,7 +83,7 @@ class LoginActivity : AppCompatActivity() {
                     UserRepository().getProfile()
                     withContext(Main){
                         startActivity(
-                            Intent(this@LoginActivity, TrackActivity::class.java)
+                            Intent(this@LoginActivity, OptionScreenActivity::class.java)
                         )
                     }
                 }

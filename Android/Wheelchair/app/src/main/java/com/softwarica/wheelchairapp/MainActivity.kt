@@ -46,8 +46,8 @@ class MainActivity() : AppCompatActivity(), Node.OnTouchListener {
         localPosition = Vector3(0f, -3f, -7f)
         localScale = Vector3(6f, 6f, 6f)
         name = "Wheelchair"
-
     }
+
    lateinit var sceneView : SceneView
     var lastDeltaYAxisAngle : Float = 0f;
 
