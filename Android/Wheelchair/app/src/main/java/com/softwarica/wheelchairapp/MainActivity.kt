@@ -79,9 +79,6 @@ class MainActivity() : AppCompatActivity(), Node.OnTouchListener {
             }
 
         }
-
-
-
         mDetector = GestureDetectorCompat(this, FlingGestureDetector())
         wheelchair.setOnTouchListener(this)
     }

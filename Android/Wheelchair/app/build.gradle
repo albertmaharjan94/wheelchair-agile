@@ -67,6 +67,18 @@ dependencies {
     implementation 'com.github.felHR85:UsbSerial:6.1.0'
     implementation 'com.google.android.gms:play-services-location:16.0.0'
 
+
+    implementation 'com.squareup.retrofit2:retrofit:2.1.0'
+    implementation 'com.google.code.gson:gson:2.6.2'
+    implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
+
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.1"))
+
+    // define any required OkHttp artifacts without version
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
+
+
 }
 
 apply plugin: 'com.google.ar.sceneform.plugin'
