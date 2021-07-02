@@ -3,6 +3,7 @@ package com.softwarica.wheelchairapp.ui.main.Auth
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -12,7 +13,7 @@ import com.softwarica.wheelchairapp.R
 import com.softwarica.wheelchairapp.Utils.Validator
 import com.softwarica.wheelchairapp.network.model.User
 import com.softwarica.wheelchairapp.network.repository.UserRepository
-import com.softwarica.wheelchairapp.ui.main.Activity.TrackActivity
+//import com.softwarica.wheelchairapp.ui.main.Activity.TrackActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,6 +30,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
         viewInit()
     }
 
@@ -37,18 +39,19 @@ class LoginActivity : AppCompatActivity() {
         passwordtxt = findViewById(R.id.passwordtxt)
         loginbtn = findViewById(R.id.lgnbtn)
 
-        loginbtn.setOnClickListener({
+        viewModel =
+            ViewModelProvider(this).get(LoginViewModel::class.java)
 
+        loginbtn.setOnClickListener {
             var username = usernametxt.text.toString()
             var password = passwordtxt.text.toString()
 
-            if(validate(username, password)){
+            if (validate(username, password)) {
                 login(username, password)
             }
-        })
+        }
 
-        viewModel =
-            ViewModelProvider(this).get(LoginViewModel::class.java)
+
     }
 
 
@@ -77,6 +80,7 @@ class LoginActivity : AppCompatActivity() {
         var data : User? = null
         viewModel.user.observe(this, {
             data = it
+            Log.d("LoginData",data.toString())
             if(data != null){
                 saveUser(email, password)
                 CoroutineScope(Dispatchers.IO).launch {

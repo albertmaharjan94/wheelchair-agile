@@ -16,6 +16,9 @@ class Constants {
 
         val DEBUG : Boolean = false
 
+//        val BaseURL = "http://10.0.2.2:3000/api/"
+    val BaseURL = "http://192.168.43.149:3000/api/"
+
     }
 }
 

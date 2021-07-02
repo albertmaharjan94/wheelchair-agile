@@ -31,6 +31,14 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.softwarica.wheelchairapp.R
+import com.softwarica.wheelchairapp.network.api.ServiceBuilder
+import com.softwarica.wheelchairapp.network.model.Coordinates
+import com.softwarica.wheelchairapp.network.model.Tracker
+import com.softwarica.wheelchairapp.network.repository.TrackerRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.*
 
@@ -155,7 +163,8 @@ class MapsFragment : Fragment() {
                         } catch (e: java.lang.Exception) {
                             e.printStackTrace()
                         }
-                        sendSMS(emergency_number,
+                        sendSMS(
+                            emergency_number,
                             "!!!EMERGENCY!!!\n" +
                                     "Latitude: ${current_location!!.latitude} , Longitude: ${current_location!!.longitude}\n" +
                                     "Address: ${current_address}\n" +
@@ -235,6 +244,10 @@ class MapsFragment : Fragment() {
             // tracker function here
 
             current_address = getLocationAddress(loc)
+            val coordinates = arrayOf<Double>(
+                loc.latitude, loc.longitude
+            )
+            tracker(coordinates)
             mapView!!.getMapAsync(callback)
 
         }
@@ -242,6 +255,44 @@ class MapsFragment : Fragment() {
         override fun onProviderDisabled(provider: String) {}
         override fun onProviderEnabled(provider: String) {}
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
+    }
+
+    private fun tracker(coordinates: Array<Double>) {
+        val userDetail = ServiceBuilder.logged_user
+        val tracker = Tracker(
+            userDetail?.userid!!,
+            userDetail.vehicle!!,
+            Coordinates(coordinates)
+        )
+//
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = TrackerRepository().addTracker(tracker)
+                if (response.success!!) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            context,
+                            "Location updated",
+                            Toast.LENGTH_LONG
+                        )
+                            .show()
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            context,
+                            "Location failed to update",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } catch (ex: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG).show()
+                }
+            }
+
+        }
     }
 
     private fun getLocationAddress(loc: Location): String {

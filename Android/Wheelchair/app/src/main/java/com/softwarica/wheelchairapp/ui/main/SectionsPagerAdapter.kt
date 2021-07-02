@@ -1,6 +1,5 @@
 package com.softwarica.wheelchairapp.ui.main
 
-import android.accounts.Account
 import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -9,6 +8,7 @@ import com.softwarica.wheelchairapp.R
 import com.softwarica.wheelchairapp.ui.main.Dash.ModelFragment
 import com.softwarica.wheelchairapp.ui.main.Maps.MapsFragment
 import com.softwarica.wheelchairapp.ui.main.Stats.PlaceholderFragment
+import com.softwarica.wheelchairapp.ui.main.Stats.PlaceholderFragment.Companion.newInstance
 import com.softwarica.wheelchairapp.ui.main.User.AccountsFragment
 
 private val TAB_TITLES = arrayOf(

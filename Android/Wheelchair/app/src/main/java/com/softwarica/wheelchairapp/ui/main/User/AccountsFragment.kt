@@ -1,49 +1,56 @@
 package com.softwarica.wheelchairapp.ui.main.User
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.Fragment
 import com.softwarica.wheelchairapp.R
-import com.softwarica.wheelchairapp.ui.main.Maps.MapsFragment
+import com.softwarica.wheelchairapp.network.api.ServiceBuilder
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [AccountsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class AccountsFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var root : View
+    private lateinit var fullname : TextView
+    private lateinit var address : TextView
+    private lateinit var contact : TextView
+    private lateinit var distance : TextView
+    private lateinit var speed : TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_accounts, container, false)
+        root =  inflater.inflate(R.layout.fragment_accounts, container, false)
+
+        init()
+        setProfile()
+
+        return root
+    }
+
+    private fun setProfile(){
+        fullname.text = ServiceBuilder.logged_user?.name
+        address.text = ServiceBuilder.logged_user?.address
+        contact.text = ServiceBuilder.logged_user?.contact
+        distance.text = ServiceBuilder.logged_user?.distance.toString()
+        speed.text = ServiceBuilder.logged_user?.speed.toString()
+    }
+
+    private fun init(){
+        fullname = root.findViewById(R.id.fullname)
+        address = root.findViewById(R.id.address)
+        contact = root.findViewById(R.id.number)
+        distance = root.findViewById(R.id.tvdistance)
+        speed = root.findViewById(R.id.tvspeed)
     }
 
     companion object {
 
         private const val ARG_SECTION_NUMBER = "section_number"
 
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(sectionNumber: Int): AccountsFragment {
             return AccountsFragment().apply {

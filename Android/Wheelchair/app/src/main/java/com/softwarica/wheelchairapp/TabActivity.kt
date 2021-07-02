@@ -17,11 +17,22 @@ import com.google.android.material.tabs.TabLayout
 import com.softwarica.wheelchairapp.Utils.Constants
 import com.softwarica.wheelchairapp.ViewPager.CustomViewPager
 import com.softwarica.wheelchairapp.adapters.DeviceListAdapter
+import com.softwarica.wheelchairapp.network.api.ServiceBuilder
+import com.softwarica.wheelchairapp.network.model.EndActivity
+import com.softwarica.wheelchairapp.network.repository.ActivityRespository
+import com.softwarica.wheelchairapp.network.repository.UserRepository
 import com.softwarica.wheelchairapp.services.UsbService
 import com.softwarica.wheelchairapp.ui.main.Dash.ModelViewModel
 import com.softwarica.wheelchairapp.ui.main.SectionsPagerAdapter
 import io.ghyeok.stickyswitch.widget.StickySwitch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.*
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 
 class TabActivity : AppCompatActivity() {
@@ -456,6 +467,8 @@ class TabActivity : AppCompatActivity() {
     }
 
     private fun wheelChairStart() {
+        //hit api
+        startActivity()
         _key = 1
         _brake = 0
         writeToArduino()
@@ -463,6 +476,8 @@ class TabActivity : AppCompatActivity() {
     }
 
     fun wheelChairStop() {
+        //hit api
+        endActivity()
         _key = 0
         _reverse = 0
         _brake = 1
@@ -474,6 +489,59 @@ class TabActivity : AppCompatActivity() {
         reverse.visibility = View.VISIBLE
         headlights.visibility = View.VISIBLE
     }
+
+    private fun startActivity() {
+        val currentTime = LocalTime.now()
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                val vehicle = ServiceBuilder.logged_user?.vehicle
+                val startTime = currentTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM))
+                val response = ActivityRespository().startActivity(vehicle!!, startTime.toString() )
+
+                withContext(Dispatchers.Main){
+                    if(response.success == true ){
+                        ServiceBuilder.startTime = startTime
+                        Toast.makeText(this@TabActivity, response.message, Toast.LENGTH_SHORT).show()
+                    }
+                    else{
+                        Toast.makeText(this@TabActivity, "Unable to track activity", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+        catch (ex: Exception){
+            Toast.makeText(this, ex.toString(), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun endActivity() {
+        val currentTime = LocalTime.now()
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                val vehicle = ServiceBuilder.logged_user?.vehicle
+                val startTime = ServiceBuilder.startTime
+                val endTime = currentTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM))
+                val distance = 30
+                val speed = 5
+                val endActivity = EndActivity(vehicle!!,startTime!!,endTime,speed,distance)
+                val response = ActivityRespository().endActivity(endActivity)
+
+                withContext(Dispatchers.Main){
+                    if(response.success == true ){
+                        Toast.makeText(this@TabActivity, response.message, Toast.LENGTH_SHORT).show()
+                    }
+                    else{
+                        Toast.makeText(this@TabActivity, "Unable to track activity", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+        catch (ex: Exception){
+            Toast.makeText(this, ex.toString(), Toast.LENGTH_LONG).show()
+        }
+    }
+
+
 
     override fun onBackPressed() {
         // Terminate Bluetooth Connection and close app

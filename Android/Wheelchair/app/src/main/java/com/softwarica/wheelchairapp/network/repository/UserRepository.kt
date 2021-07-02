@@ -6,6 +6,7 @@ import com.softwarica.wheelchairapp.network.api.ServiceBuilder
 import com.softwarica.wheelchairapp.network.api.VehicleAPIRequest
 
 import com.softwarica.wheelchairapp.network.model.User
+import kotlin.math.log
 
 
 class UserRepository : VehicleAPIRequest() {
@@ -22,11 +23,13 @@ class UserRepository : VehicleAPIRequest() {
         ServiceBuilder.logged_user = response.data
         ServiceBuilder.token = response.data?.token
 
-        return if (response.success == true || response.success == false){
-            response.data
-        } else{
-            checkUser(email,password)
-        }
+//        return if (response.success == true || response.success == false){
+            Log.d("Logingg", response.toString())
+            return response.data
+
+//        } else{
+//            checkUser(email,password)
+//        }
     }
 
     suspend fun getProfile(){
