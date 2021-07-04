@@ -7,19 +7,23 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.softwarica.wheelchairapp.network.dao.ActivityDao
+import com.softwarica.wheelchairapp.network.dao.TrackerDao
 import com.softwarica.wheelchairapp.network.model.StartActivity
 import com.softwarica.wheelchairapp.network.model.StartTimeConverter
+import com.softwarica.wheelchairapp.network.model.Tracker
+import com.softwarica.wheelchairapp.network.model.TrackerTypeConverter
 
 @Database(
-    entities = [(StartActivity::class)],
+    entities = [(StartActivity::class), (Tracker::class)],
     version = 1
 )
-@TypeConverters(StartTimeConverter::class)
+@TypeConverters(StartTimeConverter::class, TrackerTypeConverter::class)
+//@TypeConverters()
 
 abstract class WheelDB : RoomDatabase() {
     abstract fun getActivityDao(): ActivityDao
 //    abstract fun getAuthDao(): AuthDao
-//    abstract fun getTrackerDao(): TrackerDao
+    abstract fun getTrackerDao(): TrackerDao
 
     companion object{
         @Volatile

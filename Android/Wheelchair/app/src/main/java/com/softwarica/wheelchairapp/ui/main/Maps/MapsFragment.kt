@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.softwarica.wheelchairapp.R
 import com.softwarica.wheelchairapp.network.api.ServiceBuilder
+import com.softwarica.wheelchairapp.network.database_conf.WheelDB
 import com.softwarica.wheelchairapp.network.model.Coordinates
 import com.softwarica.wheelchairapp.network.model.Tracker
 import com.softwarica.wheelchairapp.network.repository.TrackerRepository
@@ -258,18 +259,20 @@ class MapsFragment : Fragment() {
     }
 
     private fun tracker(coordinates: Array<Double>) {
+        val getTrackerInstance = WheelDB.getinstance(requireContext()).getTrackerDao()
         val userDetail = ServiceBuilder.logged_user
         val tracker = Tracker(
             userDetail?.userid!!,
             userDetail.vehicle!!,
             Coordinates(coordinates)
         )
-//
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = TrackerRepository().addTracker(tracker)
                 if (response.success!!) {
                     withContext(Dispatchers.Main) {
+                        getTrackerInstance.addTracker(tracker)
                         Toast.makeText(
                             context,
                             "Location updated",
