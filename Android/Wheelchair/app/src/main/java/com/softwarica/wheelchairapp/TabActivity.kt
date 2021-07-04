@@ -18,7 +18,10 @@ import com.softwarica.wheelchairapp.Utils.Constants
 import com.softwarica.wheelchairapp.ViewPager.CustomViewPager
 import com.softwarica.wheelchairapp.adapters.DeviceListAdapter
 import com.softwarica.wheelchairapp.network.api.ServiceBuilder
+import com.softwarica.wheelchairapp.network.database_conf.WheelDB
 import com.softwarica.wheelchairapp.network.model.EndActivity
+import com.softwarica.wheelchairapp.network.model.StartActivity
+import com.softwarica.wheelchairapp.network.model.StartTime
 import com.softwarica.wheelchairapp.network.repository.ActivityRespository
 import com.softwarica.wheelchairapp.network.repository.UserRepository
 import com.softwarica.wheelchairapp.services.UsbService
@@ -492,14 +495,17 @@ class TabActivity : AppCompatActivity() {
 
     private fun startActivity() {
         val currentTime = LocalTime.now()
+        val vehicle = ServiceBuilder.logged_user?.vehicle
+        val startTime = currentTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM))
+        val getActivityInstance = WheelDB.getinstance(this@TabActivity).getActivityDao()
+
         try {
             CoroutineScope(Dispatchers.IO).launch {
-                val vehicle = ServiceBuilder.logged_user?.vehicle
-                val startTime = currentTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM))
                 val response = ActivityRespository().startActivity(vehicle!!, startTime.toString() )
-
                 withContext(Dispatchers.Main){
                     if(response.success == true ){
+                        val startActivity = StartActivity(vehicle, arrayOf(StartTime(startTime.toString())))
+                        getActivityInstance.addStartActivity(startActivity)
                         ServiceBuilder.startTime = startTime
                         Toast.makeText(this@TabActivity, response.message, Toast.LENGTH_SHORT).show()
                     }
@@ -509,6 +515,7 @@ class TabActivity : AppCompatActivity() {
                 }
             }
         }
+
         catch (ex: Exception){
             Toast.makeText(this, ex.toString(), Toast.LENGTH_LONG).show()
         }
