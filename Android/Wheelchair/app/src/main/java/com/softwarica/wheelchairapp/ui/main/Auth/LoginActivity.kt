@@ -1,5 +1,6 @@
 package com.softwarica.wheelchairapp.ui.main.Auth
 
+import android.bluetooth.BluetoothHearingAid
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,6 +12,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.softwarica.wheelchairapp.OptionScreenActivity
 import com.softwarica.wheelchairapp.R
 import com.softwarica.wheelchairapp.Utils.Validator
+import com.softwarica.wheelchairapp.network.dao.AuthDao
+import com.softwarica.wheelchairapp.network.database_conf.WheelDB
 import com.softwarica.wheelchairapp.network.model.User
 import com.softwarica.wheelchairapp.network.repository.UserRepository
 //import com.softwarica.wheelchairapp.ui.main.Activity.TrackActivity
@@ -27,6 +30,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var loginbtn : Button
     private lateinit var passwordtxt : EditText
     private lateinit var viewModel: LoginViewModel
+    private lateinit var authInstance : AuthDao
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -39,8 +43,9 @@ class LoginActivity : AppCompatActivity() {
         passwordtxt = findViewById(R.id.passwordtxt)
         loginbtn = findViewById(R.id.lgnbtn)
 
+        authInstance = WheelDB.getinstance(this).getAuthDao()
         viewModel =
-            ViewModelProvider(this).get(LoginViewModel::class.java)
+            ViewModelProvider(this, LoginViewModelFactory(authInstance)).get(LoginViewModel::class.java)
 
         loginbtn.setOnClickListener {
             var username = usernametxt.text.toString()
@@ -78,13 +83,14 @@ class LoginActivity : AppCompatActivity() {
     private fun login(email : String, password : String){
         viewModel.checkUser(email,password)
         var data : User? = null
+
         viewModel.user.observe(this, {
             data = it
             Log.d("LoginData",data.toString())
             if(data != null){
                 saveUser(email, password)
                 CoroutineScope(Dispatchers.IO).launch {
-                    UserRepository().getProfile()
+                    UserRepository(authInstance).getProfile(password)
                     withContext(Main){
                         startActivity(
                             Intent(this@LoginActivity, OptionScreenActivity::class.java)

@@ -4,7 +4,20 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ee806ec1-6d32-45e5-82cf-6e696221d80d" name="Default Changelist" comment="" />
+    <list default="true" id="ee806ec1-6d32-45e5-82cf-6e696221d80d" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/BaseClass.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/api/ConnectivityReceiver.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/ui/main/Auth/LoginViewModelFactory.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/dao/AuthDao.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/dao/AuthDao.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/database_conf/WheelDB.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/database_conf/WheelDB.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/model/StartTimeConverter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/model/StartTimeConverter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/model/TrackerTypeConverter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/model/TrackerTypeConverter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/model/User.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/model/User.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/repository/UserRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/repository/UserRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/ui/main/Auth/LoginActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/ui/main/Auth/LoginActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/ui/main/Auth/LoginViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/ui/main/Auth/LoginViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/ui/main/Stats/PageViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/ui/main/Stats/PageViewModel.kt" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

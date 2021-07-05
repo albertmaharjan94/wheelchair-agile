@@ -13,18 +13,31 @@ class TrackerRepository : VehicleAPIRequest(){
     private var trackerAPI = ServiceBuilder.buildService(TrackerAPI::class.java)
 
     //Add Activity
-    suspend fun addTracker(tracker: Tracker): Res {
-        val response =  apiRequest{
-            trackerAPI.tracker(
-                ServiceBuilder.token!!,
-                tracker
-            )
-        }
-        return if (response.success == true || response.success == false){
+    suspend fun addTracker(tracker: Tracker): Res? {
+        val res : Res ?= try{
+            val response =  apiRequest{
+                trackerAPI.tracker(
+                    ServiceBuilder.token!!,
+                    tracker
+                )
+            }
             response
-        } else{
-            addTracker(tracker)
         }
+        catch (ex: Exception){
+            null
+        }
+
+        if(res == null){
+//            addTracker() Dao
+        }
+
+        return res
+
+//        return if (response.success == true || response.success == false){
+//            response
+//        } else{
+//            addTracker(tracker)
+//        }
     }
 
 //    suspend fun getLocation(): Activity? {
