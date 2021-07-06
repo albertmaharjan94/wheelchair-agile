@@ -13,6 +13,8 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.*
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.telephony.SmsManager
 import android.util.Log
 import android.view.LayoutInflater
@@ -49,6 +51,7 @@ class MapsFragment : Fragment() {
     var locationManager: LocationManager? = null
     var current_location: LatLng? = null
     var current_address: String? = null
+    var changeLoc : Boolean ?= true
     var locationListener: LocationListener = MyLocationListener()
 
     var mCurrLocationMarker: Marker? = null
@@ -109,6 +112,9 @@ class MapsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Handler(Looper.getMainLooper()).postDelayed({
+            changeLoc = true
+        }, 1000)
         return inflater.inflate(R.layout.fragment_maps, container, false)
     }
 
@@ -248,7 +254,12 @@ class MapsFragment : Fragment() {
             val coordinates = arrayOf<Double>(
                 loc.latitude, loc.longitude
             )
-            tracker(coordinates)
+//            Toast.makeText(context, "location.........", Toast.LENGTH_SHORT).show()
+            if(changeLoc!!){
+                changeLoc = false
+                tracker(coordinates)
+            }
+
             mapView!!.getMapAsync(callback)
 
         }
@@ -270,15 +281,15 @@ class MapsFragment : Fragment() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = TrackerRepository().addTracker(tracker)
-                if (response.success!!) {
+                if (response?.success!!) {
                     withContext(Dispatchers.Main) {
                         getTrackerInstance.addTracker(tracker)
-                        Toast.makeText(
-                            context,
-                            "Location updated",
-                            Toast.LENGTH_LONG
-                        )
-                            .show()
+//                        Toast.makeText(
+//                            context,
+//                            "Location updated",
+//                            Toast.LENGTH_LONG
+//                        )
+//                            .show()
                     }
                 } else {
                     withContext(Dispatchers.Main) {

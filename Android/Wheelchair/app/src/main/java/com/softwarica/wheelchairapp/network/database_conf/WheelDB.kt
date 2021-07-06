@@ -11,7 +11,7 @@ import com.softwarica.wheelchairapp.network.dao.TrackerDao
 import com.softwarica.wheelchairapp.network.model.*
 
 @Database(
-    entities = [(StartActivity::class), (Tracker::class), (User::class)],
+    entities = [(StartActivity::class), (EndActivity::class), (Tracker::class), (User::class)],
     version = 1
 )
 @TypeConverters(StartTimeConverter::class, TrackerTypeConverter::class)

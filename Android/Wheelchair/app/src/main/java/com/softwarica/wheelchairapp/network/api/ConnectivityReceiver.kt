@@ -1,29 +1,35 @@
 package com.softwarica.wheelchairapp.network.api
 
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
 import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkRequest
+import android.widget.Toast
+import com.softwarica.wheelchairapp.Utils.Variables
 
-class ConnectivityReceiver : BroadcastReceiver() {
+class ConnectivityReceiver(val context: Context) {
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        if (connectivityReceiverListener != null) {
-            connectivityReceiverListener!!.onNetworkConnectionChanged(isConnectedOrConnecting(context!!))
+    fun registerNetworkCallback() {
+        try {
+            val connectivityManager =
+                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val builder = NetworkRequest.Builder()
+            connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    Variables().isNetworkConnected = true // Global Static Variable
+                    Toast.makeText(context, "Internet Connected", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onLost(network: Network) {
+                    Variables().isNetworkConnected = false // Global Static Variable
+                    Toast.makeText(context, "Internet Connection lost", Toast.LENGTH_SHORT).show()
+                }
+            }
+            )
+            Variables().isNetworkConnected = false
+        } catch (e: Exception) {
+            Variables().isNetworkConnected = false
         }
     }
 
-    private fun isConnectedOrConnecting(context: Context): Boolean {
-        val connMgr = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo = connMgr.activeNetworkInfo
-        return networkInfo != null && networkInfo.isConnectedOrConnecting
-    }
-
-    interface ConnectivityReceiverListener {
-        fun onNetworkConnectionChanged(isConnected: Boolean)
-    }
-
-    companion object {
-        var connectivityReceiverListener: ConnectivityReceiverListener? = null
-    }
 }

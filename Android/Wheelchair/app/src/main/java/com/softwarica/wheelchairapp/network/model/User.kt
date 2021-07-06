@@ -17,5 +17,5 @@ data class User(
     val speed: Float?,
 ){
     @PrimaryKey(autoGenerate = true)
-    var _Id: Int = 0
+    var name_id: Int = 0
 }
