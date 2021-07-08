@@ -12,9 +12,9 @@ interface TrackerDao {
     @Insert
     suspend fun addTracker(tracker: Tracker)
 
-//    @Query("select * from Tracker")
-//    suspend fun checkAuth(): Array<Tracker>
-//
-//    @Delete
-//    suspend fun deleteTracker(tracker: Tracker)
+    @Query("select * from Tracker")
+    suspend fun selectTracker(): Array<Tracker>
+
+    @Delete
+    suspend fun deleteTracker(tracker: Tracker)
 }

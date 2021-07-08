@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.softwarica.wheelchairapp.network.dao.StartActivityDao
 import com.softwarica.wheelchairapp.network.dao.AuthDao
+import com.softwarica.wheelchairapp.network.dao.EndActivityDao
 import com.softwarica.wheelchairapp.network.dao.TrackerDao
 import com.softwarica.wheelchairapp.network.model.*
 
@@ -18,7 +19,8 @@ import com.softwarica.wheelchairapp.network.model.*
 //@TypeConverters()
 
 abstract class WheelDB : RoomDatabase() {
-    abstract fun getActivityDao(): StartActivityDao
+    abstract fun getStartActivityDao(): StartActivityDao
+    abstract fun getEndActivityDao(): EndActivityDao
     abstract fun getAuthDao(): AuthDao
     abstract fun getTrackerDao(): TrackerDao
 

@@ -501,7 +501,7 @@ class TabActivity : AppCompatActivity() {
         val currentTime = LocalTime.now()
         val vehicle = ServiceBuilder.logged_user?.vehicle
         val startTime = currentTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM))
-        val getActivityInstance = WheelDB.getinstance(this@TabActivity).getActivityDao()
+        val getActivityInstance = WheelDB.getinstance(this@TabActivity).getStartActivityDao()
 
         try {
             CoroutineScope(Dispatchers.IO).launch {
@@ -535,6 +535,7 @@ class TabActivity : AppCompatActivity() {
 
     private fun endActivity() {
         val currentTime = LocalTime.now()
+        val getActivityInstance = WheelDB.getinstance(this@TabActivity).getEndActivityDao()
         try {
             CoroutineScope(Dispatchers.IO).launch {
                 val vehicle = ServiceBuilder.logged_user?.vehicle
@@ -543,7 +544,7 @@ class TabActivity : AppCompatActivity() {
                     currentTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM))
                 val distance = 5
                 val speed = 30
-                val endActivity = EndActivity(vehicle!!, startTime!!, endTime, speed, distance)
+                val endActivity = EndActivity(startTime!!, vehicle!!, endTime, speed, distance)
                 val response = ActivityRespository().endActivity(endActivity)
 
                 withContext(Dispatchers.Main) {
@@ -552,16 +553,17 @@ class TabActivity : AppCompatActivity() {
                             .show()
                     } else {
                         //DAO
+                        getActivityInstance.addEndActivity(endActivity)
                         Toast.makeText(
                             this@TabActivity,
-                            "Unable to track activity",
+                            "Activity tracked locally",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
                 }
             }
         } catch (ex: Exception) {
-            Toast.makeText(this, ex.toString(), Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Unable to track activity", Toast.LENGTH_LONG).show()
         }
     }
 

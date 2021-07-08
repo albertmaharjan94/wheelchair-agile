@@ -5,17 +5,16 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class User(
+    @PrimaryKey()
+    val userid: String,
     val name: String?,
-    val userid: String?,
     val email: String?,
     var password : String?,
     val address: String?,
     val contact: String?,
+    val emContact: String?,
     var token : String?,
     val vehicle : String?,
     val distance: Float?,
     val speed: Float?,
-){
-    @PrimaryKey(autoGenerate = true)
-    var name_id: Int = 0
-}
+)

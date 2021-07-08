@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.softwarica.wheelchairapp.OptionScreenActivity
 import com.softwarica.wheelchairapp.R
 import com.softwarica.wheelchairapp.Utils.Validator
+import com.softwarica.wheelchairapp.network.api.ServiceBuilder
 import com.softwarica.wheelchairapp.network.dao.AuthDao
 import com.softwarica.wheelchairapp.network.database_conf.WheelDB
 import com.softwarica.wheelchairapp.network.model.User
@@ -87,19 +88,24 @@ class LoginActivity : AppCompatActivity() {
         viewModel.user.observe(this, {
             data = it
             Log.d("LoginData",data.toString())
-            if(data != null){
-                saveUser(email, password)
-                CoroutineScope(Dispatchers.IO).launch {
-                    UserRepository(authInstance).getProfile(password)
-                    withContext(Main){
-                        startActivity(
-                            Intent(this@LoginActivity, OptionScreenActivity::class.java)
-                        )
-                    }
-                }
+            if(ServiceBuilder.token =="-1"){
+                Toast.makeText(this, "Unable tp connect server", Toast.LENGTH_SHORT).show()
             }
             else{
-                Toast.makeText(this, "Email or password is incorrect", Toast.LENGTH_SHORT).show()
+                if(data != null){
+                    saveUser(email, password)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        UserRepository(authInstance).getProfile(password)
+                        withContext(Main){
+                            startActivity(
+                                Intent(this@LoginActivity, OptionScreenActivity::class.java)
+                            )
+                        }
+                    }
+                }
+                else{
+                    Toast.makeText(this, "Email or password is incorrect", Toast.LENGTH_SHORT).show()
+                }
             }
         })
     }

@@ -1,6 +1,7 @@
 package com.softwarica.wheelchairapp.network.repository
 
 import android.util.Log
+import android.widget.Toast
 import com.softwarica.wheelchairapp.network.api.AuthAPI
 import com.softwarica.wheelchairapp.network.api.ServiceBuilder
 import com.softwarica.wheelchairapp.network.api.VehicleAPIRequest
@@ -10,6 +11,7 @@ import com.softwarica.wheelchairapp.network.database_conf.WheelDB
 import com.softwarica.wheelchairapp.network.model.User
 import com.softwarica.wheelchairapp.network.response.UserResponse
 import java.lang.Exception
+import kotlin.coroutines.coroutineContext
 import kotlin.math.log
 
 
@@ -20,7 +22,7 @@ class UserRepository(private val authDao: AuthDao) : VehicleAPIRequest() {
 
 
     //Login user
-    suspend fun checkUser(email: String, password: String): User {
+    suspend fun checkUser(email: String, password: String): User? {
         var data = try {
             val response = apiRequest {
                 authAPI.loginUser(email, password)
@@ -32,10 +34,15 @@ class UserRepository(private val authDao: AuthDao) : VehicleAPIRequest() {
             null
         }
 
-        if (data == null) data = authDao.checkAuth(email, password)
-
-        ServiceBuilder.logged_user = data
-        ServiceBuilder.token = data.token
+        try {
+            if (data == null) data = authDao.checkAuth(email, password)
+            ServiceBuilder.logged_user = data
+            ServiceBuilder.token = data.token
+        }
+        catch (ex: Exception){
+            ex.printStackTrace()
+            ServiceBuilder.token = "-1"
+        }
 
         return data
     }

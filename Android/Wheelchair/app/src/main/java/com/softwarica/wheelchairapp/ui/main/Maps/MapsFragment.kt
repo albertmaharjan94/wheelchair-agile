@@ -46,12 +46,14 @@ import java.io.IOException
 import java.util.*
 
 
+
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class MapsFragment : Fragment() {
     var locationManager: LocationManager? = null
     var current_location: LatLng? = null
     var current_address: String? = null
     var changeLoc : Boolean ?= true
+    var checkHandler : Boolean ?= true
     var locationListener: LocationListener = MyLocationListener()
 
     var mCurrLocationMarker: Marker? = null
@@ -64,7 +66,6 @@ class MapsFragment : Fragment() {
     var first_marking = true
     private var googleMap: GoogleMap? = null
 
-    val emergency_number = "+9779808438993"
 
     @SuppressLint("MissingPermission")
     private val callback = OnMapReadyCallback { mMap ->
@@ -112,9 +113,7 @@ class MapsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Handler(Looper.getMainLooper()).postDelayed({
-            changeLoc = true
-        }, 1000)
+
         return inflater.inflate(R.layout.fragment_maps, container, false)
     }
 
@@ -171,7 +170,7 @@ class MapsFragment : Fragment() {
                             e.printStackTrace()
                         }
                         sendSMS(
-                            emergency_number,
+                            ServiceBuilder.logged_user?.emContact.toString(),
                             "!!!EMERGENCY!!!\n" +
                                     "Latitude: ${current_location!!.latitude} , Longitude: ${current_location!!.longitude}\n" +
                                     "Address: ${current_address}\n" +
@@ -183,10 +182,7 @@ class MapsFragment : Fragment() {
                             "Required permission not found. Please try again.",
                             Toast.LENGTH_LONG
                         ).show()
-
-
                     }
-
                 }
                 .setNegativeButton("Cancel", null).show()
         }
@@ -197,6 +193,8 @@ class MapsFragment : Fragment() {
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
+
+
 
 
         locationManager =
@@ -215,13 +213,11 @@ class MapsFragment : Fragment() {
 
         try {
             locationManager!!.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER, 1000, 1F, locationListener
+                LocationManager.GPS_PROVIDER, 1000, 5F, locationListener
             )
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
-
     }
 
     companion object {
@@ -255,9 +251,18 @@ class MapsFragment : Fragment() {
                 loc.latitude, loc.longitude
             )
 //            Toast.makeText(context, "location.........", Toast.LENGTH_SHORT).show()
+            Log.d("CheckHandler", checkHandler.toString())
+            Log.d("ChangeLoc", changeLoc.toString())
             if(changeLoc!!){
-                changeLoc = false
-                tracker(coordinates)
+                if(checkHandler!!){
+                    tracker(coordinates)
+                    changeLoc = false
+                    checkHandler = false
+                    Handler().postDelayed({
+                        changeLoc = true
+                        checkHandler = true
+                    }, 8000)
+                }
             }
 
             mapView!!.getMapAsync(callback)
@@ -279,32 +284,34 @@ class MapsFragment : Fragment() {
         )
 
         CoroutineScope(Dispatchers.IO).launch {
-            try {
+//            try {
                 val response = TrackerRepository().addTracker(tracker)
-                if (response?.success!!) {
-                    withContext(Dispatchers.Main) {
-                        getTrackerInstance.addTracker(tracker)
-//                        Toast.makeText(
-//                            context,
-//                            "Location updated",
-//                            Toast.LENGTH_LONG
-//                        )
-//                            .show()
-                    }
-                } else {
+            if(response == null){
+                withContext(Dispatchers.Main) {
+                    getTrackerInstance.addTracker(tracker)
+                    Toast.makeText(
+                        context,
+                        "Location updated locally",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+            else if (response.success!!) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
                             context,
-                            "Location failed to update",
+                            "Location updated",
                             Toast.LENGTH_LONG
-                        ).show()
+                        )
+                            .show()
                     }
                 }
-            } catch (ex: Exception) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG).show()
-                }
-            }
+//            }
+//            catch (ex: Exception) {
+//                withContext(Dispatchers.Main) {
+//                    Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG).show()
+//                }
+//            }
 
         }
     }
@@ -363,7 +370,6 @@ class MapsFragment : Fragment() {
         requireActivity().registerReceiver(deliveryBroadcastReciever, IntentFilter(DELIVERED))
         val sms = SmsManager.getDefault()
         sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI)
-
     }
 
     internal class SentReceiver : BroadcastReceiver() {

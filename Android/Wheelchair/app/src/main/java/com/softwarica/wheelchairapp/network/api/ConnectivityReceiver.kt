@@ -18,6 +18,9 @@ class ConnectivityReceiver(val context: Context) {
                 override fun onAvailable(network: Network) {
                     Variables().isNetworkConnected = true // Global Static Variable
                     Toast.makeText(context, "Internet Connected", Toast.LENGTH_SHORT).show()
+                    //DAO to API
+                    DaoToAPI().proceedStartActivity(context)
+                    DaoToAPI().proceedTracker(context)
                 }
 
                 override fun onLost(network: Network) {

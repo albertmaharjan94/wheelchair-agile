@@ -2,13 +2,14 @@ package com.softwarica.wheelchairapp.network.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.softwarica.wheelchairapp.network.model.User
 
 @Dao
 interface AuthDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addUser(user: User)
 
     @Query("select * from User where email = (:email) and password = (:password)")
