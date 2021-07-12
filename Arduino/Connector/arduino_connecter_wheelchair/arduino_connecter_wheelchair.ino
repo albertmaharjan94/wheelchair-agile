@@ -24,12 +24,13 @@ bool _key = 0;
 bool _reverse_l = 0;
 bool _reverse_r = 0;
 int _speed_1 = 0;
+int _speed_2 = 0;
 
 unsigned long previousMillis = 0;
 
 // output serial monitor // usb - 0 , bluetooth - 1
 void serialOut() {
-  String out = ((String) "g," + _key + "," + _reverse_l + "," + _reverse_r + "," + _speed_1 + ",g#");
+  String out = ((String) "g," + _key + "," + _reverse_l + "," + _reverse_r + "," + _speed_1+ ","+ _speed_2 + ",g#");
   if (_mode == 0) {
     Serial.println(out);
   }
@@ -117,6 +118,7 @@ void resetPins() {
   _reverse_r = 0;
   _reverse_l = 0;
   _speed_1 = 0;
+  _speed_2 = 0;
 }
 void loop() {
   unsigned long currentMillis = millis();
@@ -141,6 +143,7 @@ void loop() {
     _reverse_l = delimit_string(serialInput, '#', 1);
     _reverse_r = delimit_string(serialInput, '#', 2);
     _speed_1 = delimit_string(serialInput, '#', 3);
+    _speed_2 = delimit_string(serialInput, '#', 4);
   }
 
   //  debugLed();
@@ -162,6 +165,21 @@ void loop() {
       digitalWrite(reverse_r, LOW);
     } else {
       digitalWrite(reverse_r, HIGH);
+    }
+
+    if(_mode == 1){
+      if(_speed_1 >= 0){
+        digitalWrite(reverse_l, HIGH);
+      }else{
+        digitalWrite(reverse_l, LOW);
+      }
+
+      if(_speed_2 >= 0){
+        digitalWrite(reverse_r, HIGH);
+      }else{
+        digitalWrite(reverse_r, LOW);
+      }
+      
     }
   } else {
     digitalWrite(reverse_l, HIGH);
