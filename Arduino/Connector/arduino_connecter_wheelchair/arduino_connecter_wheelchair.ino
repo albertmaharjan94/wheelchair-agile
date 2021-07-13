@@ -12,9 +12,11 @@ bool _serial_available = 0;
 
 // pin defination
 int key = 3;
-int reverse_l = 10;
-int reverse_r = 11;
+int reverse_l_1 = 10;
+int reverse_l_2 = 11;
 
+int reverse_r_1 = 2;
+int reverse_r_2 = 7;
 
 int opt = 11;
 int bt_state = 4;
@@ -99,18 +101,23 @@ int delimit_string(String data, char separator, int index)
 
 void setup() {
   // put your setup code here, to run once:
-  delay(200);
+  delay(1000);
   Serial.begin(9600);
   BtSerial.begin(9600);
   pinMode(key, OUTPUT);
-  pinMode(reverse_l, OUTPUT);
-  pinMode(reverse_r, OUTPUT);
   pinMode(opt, OUTPUT);
   pinMode(bt_state, INPUT);
 
   digitalWrite(key, HIGH);
-  digitalWrite(reverse_l, HIGH);
-  digitalWrite(reverse_r, HIGH);
+  
+  pinMode(reverse_l_1, OUTPUT);
+  pinMode(reverse_l_2, OUTPUT);
+  pinMode(reverse_r_1, OUTPUT);
+  pinMode(reverse_r_2, OUTPUT);
+  digitalWrite(reverse_l_1, HIGH);
+  digitalWrite(reverse_l_2, HIGH);
+  digitalWrite(reverse_r_1, HIGH);
+  digitalWrite(reverse_r_2, HIGH);
 
 }
 void resetPins() {
@@ -156,34 +163,40 @@ void loop() {
     digitalWrite(key, LOW);
 
     if (_reverse_l == 1) {
-      digitalWrite(reverse_l, LOW);
+      digitalWrite(reverse_l_1, LOW);
+      digitalWrite(reverse_l_2, HIGH);
     } else {
-      digitalWrite(reverse_l, HIGH);
+      digitalWrite(reverse_l_1, HIGH);
+      digitalWrite(reverse_l_2, LOW);
     }
 
     if (_reverse_r == 1) {
-      digitalWrite(reverse_r, LOW);
+      digitalWrite(reverse_r_1, LOW);
+      digitalWrite(reverse_r_2, HIGH);
     } else {
-      digitalWrite(reverse_r, HIGH);
+      digitalWrite(reverse_r_1, HIGH);
+      digitalWrite(reverse_r_2, LOW);
     }
-
-    if(_mode == 1){
-      if(_speed_1 >= 0){
-        digitalWrite(reverse_l, HIGH);
-      }else{
-        digitalWrite(reverse_l, LOW);
-      }
-
-      if(_speed_2 >= 0){
-        digitalWrite(reverse_r, HIGH);
-      }else{
-        digitalWrite(reverse_r, LOW);
-      }
-      
-    }
+// // WIP
+//    if(_mode == 1){
+//      if(_speed_1 >= 0){
+//        digitalWrite(reverse_l, HIGH);
+//      }else{
+//        digitalWrite(reverse_l, LOW);
+//      }
+//
+//      if(_speed_2 >= 0){
+//        digitalWrite(reverse_r, HIGH);
+//      }else{
+//        digitalWrite(reverse_r, LOW);
+//      }
+//      
+//    }
   } else {
-    digitalWrite(reverse_l, HIGH);
-    digitalWrite(reverse_r, HIGH);
+    digitalWrite(reverse_l_1, HIGH);
+    digitalWrite(reverse_l_2, LOW);
+    digitalWrite(reverse_r_1, HIGH);
+    digitalWrite(reverse_r_2, LOW);
     digitalWrite(key, HIGH);
   }
 
