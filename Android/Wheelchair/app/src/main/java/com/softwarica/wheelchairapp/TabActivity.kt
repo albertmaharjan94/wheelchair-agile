@@ -15,13 +15,29 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
 import com.softwarica.wheelchairapp.Utils.Constants
+import com.softwarica.wheelchairapp.Utils.Variables
 import com.softwarica.wheelchairapp.ViewPager.CustomViewPager
 import com.softwarica.wheelchairapp.adapters.DeviceListAdapter
+import com.softwarica.wheelchairapp.network.api.ConnectivityReceiver
+import com.softwarica.wheelchairapp.network.api.ServiceBuilder
+import com.softwarica.wheelchairapp.network.database_conf.WheelDB
+import com.softwarica.wheelchairapp.network.model.EndActivity
+import com.softwarica.wheelchairapp.network.model.StartActivity
+import com.softwarica.wheelchairapp.network.model.StartTime
+import com.softwarica.wheelchairapp.network.repository.ActivityRespository
+import com.softwarica.wheelchairapp.network.repository.UserRepository
 import com.softwarica.wheelchairapp.services.UsbService
 import com.softwarica.wheelchairapp.ui.main.Dash.ModelViewModel
 import com.softwarica.wheelchairapp.ui.main.SectionsPagerAdapter
 import io.ghyeok.stickyswitch.widget.StickySwitch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.*
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 
 class TabActivity : AppCompatActivity() {
@@ -142,6 +158,7 @@ class TabActivity : AppCompatActivity() {
         progress?.setCancelable(false)
         viewInit()
 
+        ConnectivityReceiver(this).registerNetworkCallback()
 
         if (mode == Constants.REMOTE) {
             remoteConn()
@@ -187,7 +204,7 @@ class TabActivity : AppCompatActivity() {
     }
     var alert_pending = false
     fun viewReconBT() {
-        if(!alert_pending){
+        if (!alert_pending) {
             alert_pending = true
             AlertDialog.Builder(this@TabActivity)
                 .setTitle("Bluetooth disconnected")
@@ -209,7 +226,8 @@ class TabActivity : AppCompatActivity() {
                         ).start()
                         SystemClock.sleep(500)
 
-                        connectedThread = ConnectedThread(BluetoothFragment.mmSocket!!, this, bHandler)
+                        connectedThread =
+                            ConnectedThread(BluetoothFragment.mmSocket!!, this, bHandler)
                         connectedThread?.start()
                     } catch (e: Exception) {
                         Toast.makeText(
@@ -266,10 +284,10 @@ class TabActivity : AppCompatActivity() {
         startbtn = findViewById(R.id.startbtn)
         startbtn.setOnClickListener {
             Log.d("TAG", "onCreate: " + startbtn.getDirection())
-            if(!bt_status && mode == Constants.REMOTE){
+            if (!bt_status && mode == Constants.REMOTE) {
                 startbtn.setDirection(StickySwitch.Direction.LEFT)
                 bHandler.obtainMessage(101).sendToTarget()
-            }else{
+            } else {
                 if (startbtn.getDirection().toString() == "RIGHT") {
                     wheelChairStart()
                 } else if (startbtn.getDirection().toString() == "LEFT") {
@@ -453,12 +471,16 @@ class TabActivity : AppCompatActivity() {
     }
 
     private fun wheelChairStart() {
+        //hit api
+        startActivity()
         _key = 1
         writeToArduino()
         utilityLay.visibility = View.VISIBLE
     }
 
     fun wheelChairStop() {
+        //hit api
+        endActivity()
         _key = 0
         _reverse_l = 0
         _reverse_r = 0
@@ -473,6 +495,77 @@ class TabActivity : AppCompatActivity() {
         reverse.visibility = View.VISIBLE
         headlights.visibility = View.VISIBLE
     }
+
+    private fun startActivity() {
+        val currentTime = LocalTime.now()
+        val vehicle = ServiceBuilder.logged_user?.vehicle
+        val startTime = currentTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM))
+        val getActivityInstance = WheelDB.getinstance(this@TabActivity).getStartActivityDao()
+
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                val response = ActivityRespository().startActivity(vehicle!!, startTime.toString())
+                withContext(Dispatchers.Main) {
+                    if (response?.success == true) {
+                        Toast.makeText(this@TabActivity, response.message, Toast.LENGTH_SHORT)
+                            .show()
+                    } else {
+                        //DAO
+                        val startActivity =
+                            StartActivity(vehicle, arrayOf(StartTime(startTime.toString())))
+                        getActivityInstance.addStartActivity(startActivity)
+                        Toast.makeText(
+                            this@TabActivity,
+                            "Start Activity saved",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    ServiceBuilder.startTime = startTime
+                }
+            }
+        } catch (ex: Exception) {
+            Toast.makeText(
+                this@TabActivity,
+                "Unable to track activity",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun endActivity() {
+        val currentTime = LocalTime.now()
+        val getActivityInstance = WheelDB.getinstance(this@TabActivity).getEndActivityDao()
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                val vehicle = ServiceBuilder.logged_user?.vehicle
+                val startTime = ServiceBuilder.startTime
+                val endTime =
+                    currentTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM))
+                val distance = 5
+                val speed = 30
+                val endActivity = EndActivity(startTime!!, vehicle!!, endTime, speed, distance)
+                val response = ActivityRespository().endActivity(endActivity)
+
+                withContext(Dispatchers.Main) {
+                    if (response?.success == true) {
+                        Toast.makeText(this@TabActivity, response.message, Toast.LENGTH_SHORT)
+                            .show()
+                    } else {
+                        //DAO
+                        getActivityInstance.addEndActivity(endActivity)
+                        Toast.makeText(
+                            this@TabActivity,
+                            "Activity tracked locally",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+        } catch (ex: Exception) {
+            Toast.makeText(this, "Unable to track activity", Toast.LENGTH_LONG).show()
+        }
+    }
+
 
     override fun onBackPressed() {
         // Terminate Bluetooth Connection and close app

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.main.User.AccountsFragment">
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+        <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_man"
+                android:id="@+id/profileicon" />
+
+        <TextView
+                android:id="@+id/fullname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/profileicon"
+                android:text="Firstname Lastname"
+                android:layout_marginLeft="20dp"
+                android:textColor="@color/black"
+                android:textSize="20dp" />
+
+        <TextView
+                android:id="@+id/number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/profileicon"
+                android:layout_below="@+id/fullname"
+                android:text="9808488889"
+                android:layout_marginLeft="20dp"
+                android:textColor="#808080" />
+
+        <TextView
+                android:id="@+id/address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/profileicon"
+                android:layout_below="@+id/number"
+                android:text="Kathmandu"
+                android:layout_marginLeft="20dp"
+                android:textColor="#808080" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/distancelay">
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Distance Travelled"
+                    android:textColor="@color/black"
+                    android:textAlignment="center"
+                    android:textSize="15dp" />
+
+            <TextView
+                    android:id="@+id/tvdistance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="10000 KM"
+                    android:textAlignment="center"
+                    android:textColor="#808080" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/speedLay"
+                android:layout_marginLeft="20dp"
+                android:layout_toRightOf="@+id/distancelay">
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Avg Travel Speed"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="15dp" />
+
+            <TextView
+                    android:id="@+id/tvspeed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="10000 KM"
+                    android:textColor="#808080" />
+
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

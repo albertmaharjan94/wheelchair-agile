@@ -13,6 +13,8 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.*
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.telephony.SmsManager
 import android.util.Log
 import android.view.LayoutInflater
@@ -31,8 +33,18 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.softwarica.wheelchairapp.R
+import com.softwarica.wheelchairapp.network.api.ServiceBuilder
+import com.softwarica.wheelchairapp.network.database_conf.WheelDB
+import com.softwarica.wheelchairapp.network.model.Coordinates
+import com.softwarica.wheelchairapp.network.model.Tracker
+import com.softwarica.wheelchairapp.network.repository.TrackerRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.*
+
 
 
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
@@ -40,6 +52,8 @@ class MapsFragment : Fragment() {
     var locationManager: LocationManager? = null
     var current_location: LatLng? = null
     var current_address: String? = null
+    var changeLoc : Boolean ?= true
+    var checkHandler : Boolean ?= true
     var locationListener: LocationListener = MyLocationListener()
 
     var mCurrLocationMarker: Marker? = null
@@ -52,7 +66,6 @@ class MapsFragment : Fragment() {
     var first_marking = true
     private var googleMap: GoogleMap? = null
 
-    val emergency_number = "+9779808438993"
 
     @SuppressLint("MissingPermission")
     private val callback = OnMapReadyCallback { mMap ->
@@ -100,6 +113,7 @@ class MapsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         return inflater.inflate(R.layout.fragment_maps, container, false)
     }
 
@@ -155,7 +169,8 @@ class MapsFragment : Fragment() {
                         } catch (e: java.lang.Exception) {
                             e.printStackTrace()
                         }
-                        sendSMS(emergency_number,
+                        sendSMS(
+                            ServiceBuilder.logged_user?.emContact.toString(),
                             "!!!EMERGENCY!!!\n" +
                                     "Latitude: ${current_location!!.latitude} , Longitude: ${current_location!!.longitude}\n" +
                                     "Address: ${current_address}\n" +
@@ -167,10 +182,7 @@ class MapsFragment : Fragment() {
                             "Required permission not found. Please try again.",
                             Toast.LENGTH_LONG
                         ).show()
-
-
                     }
-
                 }
                 .setNegativeButton("Cancel", null).show()
         }
@@ -181,6 +193,8 @@ class MapsFragment : Fragment() {
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
+
+
 
 
         locationManager =
@@ -199,13 +213,11 @@ class MapsFragment : Fragment() {
 
         try {
             locationManager!!.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER, 1000, 1F, locationListener
+                LocationManager.GPS_PROVIDER, 1000, 5F, locationListener
             )
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
-
     }
 
     companion object {
@@ -235,6 +247,24 @@ class MapsFragment : Fragment() {
             // tracker function here
 
             current_address = getLocationAddress(loc)
+            val coordinates = arrayOf<Double>(
+                loc.latitude, loc.longitude
+            )
+//            Toast.makeText(context, "location.........", Toast.LENGTH_SHORT).show()
+            Log.d("CheckHandler", checkHandler.toString())
+            Log.d("ChangeLoc", changeLoc.toString())
+            if(changeLoc!!){
+                if(checkHandler!!){
+                    tracker(coordinates)
+                    changeLoc = false
+                    checkHandler = false
+                    Handler().postDelayed({
+                        changeLoc = true
+                        checkHandler = true
+                    }, 8000)
+                }
+            }
+
             mapView!!.getMapAsync(callback)
 
         }
@@ -242,6 +272,48 @@ class MapsFragment : Fragment() {
         override fun onProviderDisabled(provider: String) {}
         override fun onProviderEnabled(provider: String) {}
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
+    }
+
+    private fun tracker(coordinates: Array<Double>) {
+        val getTrackerInstance = WheelDB.getinstance(requireContext()).getTrackerDao()
+        val userDetail = ServiceBuilder.logged_user
+        val tracker = Tracker(
+            userDetail?.userid!!,
+            userDetail.vehicle!!,
+            Coordinates(coordinates)
+        )
+
+        CoroutineScope(Dispatchers.IO).launch {
+//            try {
+                val response = TrackerRepository().addTracker(tracker)
+            if(response == null){
+                withContext(Dispatchers.Main) {
+                    getTrackerInstance.addTracker(tracker)
+                    Toast.makeText(
+                        context,
+                        "Location updated locally",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+            else if (response.success!!) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            context,
+                            "Location updated",
+                            Toast.LENGTH_LONG
+                        )
+                            .show()
+                    }
+                }
+//            }
+//            catch (ex: Exception) {
+//                withContext(Dispatchers.Main) {
+//                    Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG).show()
+//                }
+//            }
+
+        }
     }
 
     private fun getLocationAddress(loc: Location): String {
@@ -298,7 +370,6 @@ class MapsFragment : Fragment() {
         requireActivity().registerReceiver(deliveryBroadcastReciever, IntentFilter(DELIVERED))
         val sms = SmsManager.getDefault()
         sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI)
-
     }
 
     internal class SentReceiver : BroadcastReceiver() {

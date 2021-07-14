@@ -9,6 +9,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.softwarica.wheelchairapp.Utils.Constants
+import com.softwarica.wheelchairapp.network.api.ServiceBuilder
+import com.softwarica.wheelchairapp.ui.main.Auth.LoginActivity
 
 
 class OptionScreenActivity : AppCompatActivity() {
@@ -22,6 +24,13 @@ class OptionScreenActivity : AppCompatActivity() {
 
         remotebtn = findViewById(R.id.remotemode)
         dockbtn = findViewById(R.id.dockmode)
+
+        val userDetail = ServiceBuilder.logged_user
+
+        if(userDetail == null){
+            startActivity(Intent(this@OptionScreenActivity, LoginActivity::class.java))
+            finish()
+        }
 
         val bluetoothDialog = BluetoothFragment()
 

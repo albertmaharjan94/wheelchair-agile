@@ -71,12 +71,7 @@ class PlaceholderFragment : Fragment() {
 
     private fun getEntries() {
         radarEntries = ArrayList()
-        radarEntries!!.add(RadarEntry(0.21f))
-        radarEntries!!.add(RadarEntry(0.12f))
-        radarEntries!!.add(RadarEntry(0.20f))
-        radarEntries!!.add(RadarEntry(0.52f))
-        radarEntries!!.add(RadarEntry(0.29f))
-        radarEntries!!.add(RadarEntry(0.62f))
+
     }
 
     companion object {
