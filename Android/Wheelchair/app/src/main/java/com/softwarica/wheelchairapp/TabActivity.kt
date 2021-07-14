@@ -44,11 +44,6 @@ class TabActivity : AppCompatActivity() {
     private val bHandler = BluetoothHandler(this)
 
 
-    //   arduino values
-    var _key = 0
-    var _brake = 1
-    var _reverse = 0
-    var _speed_1 = 0
 
     private val usbConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(arg0: ComponentName, arg1: IBinder) {
@@ -421,12 +416,14 @@ class TabActivity : AppCompatActivity() {
             "FWD" -> {
                 forward.visibility = View.GONE
                 reverse.visibility = View.VISIBLE
-                _reverse = 0
+                _reverse_l = 0
+                _reverse_r = 0
                 writeToArduino()
             }
             "REV" -> {
                 forward.visibility = View.VISIBLE; reverse.visibility = View.GONE;
-                _reverse = 1
+                _reverse_l = 1
+                _reverse_r = 1
                 writeToArduino()
             }
             "HDON" -> {
@@ -443,7 +440,7 @@ class TabActivity : AppCompatActivity() {
 
     private fun writeToArduino() {
         try {
-            val out = "$_key#$_brake#$_reverse#$_speed_1\n"
+            val out = "$_key#$_reverse_l#$_reverse_r#$_speed_1#$_speed_2\r\n"
             if (mode == Constants.DOCK) {
                 usbService?.write(out.toByteArray())
             }
@@ -457,15 +454,17 @@ class TabActivity : AppCompatActivity() {
 
     private fun wheelChairStart() {
         _key = 1
-        _brake = 0
         writeToArduino()
         utilityLay.visibility = View.VISIBLE
     }
 
     fun wheelChairStop() {
         _key = 0
-        _reverse = 0
-        _brake = 1
+        _reverse_l = 0
+        _reverse_r = 0
+        _speed_1 = 0
+        _speed_2 = 0
+
         writeToArduino()
         utilityLay.visibility = View.GONE
         forward.visibility = View.GONE
@@ -551,6 +550,12 @@ class TabActivity : AppCompatActivity() {
 
 
     companion object {
+        var _key = 0
+        var _reverse_l = 0
+        var _reverse_r = 0
+        var _speed_1 = 0
+        var _speed_2 = 0
+
 
         const val CONNECTING_STATUS = 1 // used in bluetooth handler to identify message status
 

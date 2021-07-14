@@ -121,9 +121,13 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
         jsFirst.setOnMoveListener(JoystickView.OnMoveListener { angle, strength ->
             val res = degreeToSpeed(angle, strength, safe_degree = 10)
             try{
-                val ct = TabActivity.connectedThread
-//                Log.d("Test", "${res.elementAtOrNull(0)}#${res.elementAt(1)}\n")
-                ct!!.write("${res.elementAtOrNull(0)}#${res.elementAt(1)}\n")
+                val ta = TabActivity
+                ta._speed_1 = res.elementAtOrNull(0)!!
+                ta._speed_2 = res.elementAt(1)
+                val out = "${ta._key}#${ta._reverse_l}#${ta._reverse_r}#${ta._speed_1}#${ta._speed_2}\r\n"
+                val ct = ta.connectedThread
+
+                ct!!.write(out)
             }catch (e: Exception){
                 print(e.stackTrace)
             }
