@@ -27,7 +27,7 @@ class OptionScreenActivity : AppCompatActivity() {
 
         val userDetail = ServiceBuilder.logged_user
 
-        if(userDetail == null){
+        if(userDetail == null && Constants.DEBUG_MODE==false){
             startActivity(Intent(this@OptionScreenActivity, LoginActivity::class.java))
             finish()
         }

@@ -93,6 +93,13 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
 
+
+    //animated button for login
+    implementation 'br.com.simplepass:loading-button-android:1.14.+'
+
+    // switch
+    implementation 'com.llollox:androidtoggleswitch:2.0.1'
+
 }
 
 apply plugin: 'com.google.ar.sceneform.plugin'
@@ -104,8 +111,8 @@ sceneform.asset('sampledata/scene.gltf', // 'Source Asset Path' specified during
         'sampledata/scene.sfa', // '.sfa Output Path' specified during import.
         'src/main/assets/scene')      // '.sfb Output Path' specified during import.
 
-
+//
 sceneform.asset('sampledata/wheelchair.fbx', // 'Source Asset Path' specified during import.
         'default',                    // 'Material Path' specified during import.
-        'sampledata/wheelchair.sfa', // '.sfa Output Path' specified during import.
+        'sampledata/wheelchair/wheelchair.sfa', // '.sfa Output Path' specified during import.
         'src/main/assets/wheelchair')      // '.sfb Output Path' specified during import.

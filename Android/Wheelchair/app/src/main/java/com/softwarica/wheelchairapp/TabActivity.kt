@@ -1,23 +1,29 @@
 package com.softwarica.wheelchairapp
 
 import android.app.ProgressDialog
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.*
+import android.graphics.Color
+import android.graphics.drawable.Drawable
+import android.opengl.Visibility
 import android.os.*
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.*
+import android.widget.RelativeLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
+import br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
 import com.google.android.material.tabs.TabLayout
+import com.llollox.androidtoggleswitch.widgets.ToggleSwitch
+import com.llollox.androidtoggleswitch.widgets.ToggleSwitchButton
 import com.softwarica.wheelchairapp.Utils.Constants
-import com.softwarica.wheelchairapp.Utils.Variables
 import com.softwarica.wheelchairapp.ViewPager.CustomViewPager
-import com.softwarica.wheelchairapp.adapters.DeviceListAdapter
 import com.softwarica.wheelchairapp.network.api.ConnectivityReceiver
 import com.softwarica.wheelchairapp.network.api.ServiceBuilder
 import com.softwarica.wheelchairapp.network.database_conf.WheelDB
@@ -25,7 +31,6 @@ import com.softwarica.wheelchairapp.network.model.EndActivity
 import com.softwarica.wheelchairapp.network.model.StartActivity
 import com.softwarica.wheelchairapp.network.model.StartTime
 import com.softwarica.wheelchairapp.network.repository.ActivityRespository
-import com.softwarica.wheelchairapp.network.repository.UserRepository
 import com.softwarica.wheelchairapp.services.UsbService
 import com.softwarica.wheelchairapp.ui.main.Dash.ModelViewModel
 import com.softwarica.wheelchairapp.ui.main.SectionsPagerAdapter
@@ -45,9 +50,12 @@ class TabActivity : AppCompatActivity() {
     private lateinit var reverse: ImageButton
     private lateinit var forward: ImageButton
     private lateinit var headlights: ImageButton
+    private lateinit var btnChangeMode: CircularProgressButton
     private lateinit var headlights_off: ImageButton
     private lateinit var connectLay: RelativeLayout
+    private lateinit var llMode: LinearLayout
     private lateinit var utilityLay: LinearLayout
+    private lateinit var imageTextToggleSwitch: ToggleSwitch
     private lateinit var conntxt: TextView
     private lateinit var txtDebugger: TextView
     private var bt_status = false
@@ -146,7 +154,12 @@ class TabActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(mReceiver)
+        try{
+            unregisterReceiver(mReceiver)
+        }catch (e:java.lang.Exception){
+            e.printStackTrace()
+        }
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -272,15 +285,28 @@ class TabActivity : AppCompatActivity() {
 
         forward = findViewById(R.id.forward)
         reverse = findViewById(R.id.reverse)
+        llMode = findViewById(R.id.llMode)
         headlights = findViewById(R.id.headlights)
         headlights_off = findViewById(R.id.headlights_off)
         conntxt = findViewById(R.id.connTxt)
         txtDebugger = findViewById(R.id.txtDebugger)
         connectLay = findViewById(R.id.connectLay)
+        btnChangeMode = findViewById(R.id.btnChangeMode)
+        imageTextToggleSwitch = findViewById(R.id.imageTextToggleSwitch)
 
-//        if(!Constants.DEBUG){
-//            txtDebugger.visibility = View.GONE
-//        }
+        btnChangeMode.setOnClickListener{
+            AlertDialog.Builder(this@TabActivity)
+                .setTitle("Change Mode")
+                .setMessage("Are you sure you want to change the mode")
+                .setPositiveButton("Okay") { dialog, id ->
+                    startActivity(Intent(this@TabActivity, OptionScreenActivity::class.java))
+                    finish()
+                }
+                .setNegativeButton("Cancel") { dialog, id ->
+                    dialog.dismiss()
+                }
+                .show()
+        }
         startbtn = findViewById(R.id.startbtn)
         startbtn.setOnClickListener {
             Log.d("TAG", "onCreate: " + startbtn.getDirection())
@@ -297,6 +323,55 @@ class TabActivity : AppCompatActivity() {
 
 
         }
+
+        imageTextToggleSwitch.setView(R.layout.view_image_text_toggle_button, 3,
+            object : ToggleSwitchButton.ToggleSwitchButtonDecorator {
+                override fun decorate(toggleSwitchButton: ToggleSwitchButton, view: View, position: Int) {
+                    toggleSwitchButton.checkedBackgroundColor = Color.parseColor("#00ADC1")
+                    toggleSwitchButton.uncheckedBackgroundColor = Color.parseColor("#d1e0ea")
+                    val textView = view.findViewById<TextView>(R.id.text_view)
+                    textView.text = getModeLabel(position).toString()
+                    val imageView: ImageView = view.findViewById(R.id.image_view)
+                    imageView.setImageDrawable(getModeDrawable(position))
+                }
+            },
+            object : ToggleSwitchButton.ViewDecorator {
+                override fun decorate(view: View, position: Int) {
+                    val textView = view.findViewById<TextView>(R.id.text_view)
+                    textView.setTextColor(
+                        ContextCompat.getColor(
+                            this@TabActivity,
+                            android.R.color.white
+                        )
+                    )
+                    val imageView: ImageView = view.findViewById(R.id.image_view)
+                    imageView.setColorFilter(
+                        ContextCompat.getColor(
+                            this@TabActivity,
+                            android.R.color.white
+                        )
+                    )
+                }
+            }
+            , object : ToggleSwitchButton.ViewDecorator {
+                override fun decorate(view: View, position: Int) {
+                    val textView = view.findViewById<TextView>(R.id.text_view)
+                    textView.setTextColor(ContextCompat.getColor(this@TabActivity, R.color.gray))
+                    val imageView: ImageView = view.findViewById(R.id.image_view)
+                    imageView.setColorFilter(ContextCompat.getColor(this@TabActivity, R.color.gray))
+                }
+            }
+        )
+
+        imageTextToggleSwitch.onChangeListener = object : ToggleSwitch.OnChangeListener {
+            override fun onToggleSwitchChanged(position: Int) {
+
+            }
+        }
+        imageTextToggleSwitch.setCheckedPosition(1)
+
+
+
         txtDebugger.text = mode
 
         reverse.setOnClickListener {
@@ -312,6 +387,23 @@ class TabActivity : AppCompatActivity() {
             changeState("HOFF")
         }
 
+    }
+    private fun getModeLabel(position: Int): Any {
+        return when (position) {
+            0 -> "Slow"
+            1 -> "Normal"
+            2 -> "Fast"
+            else -> throw RuntimeException("Unknown position")
+        }
+    }
+
+    private fun getModeDrawable(position: Int): Drawable? {
+        return when (position) {
+            0 -> ContextCompat.getDrawable(this@TabActivity, R.drawable.turtle)
+            1 -> ContextCompat.getDrawable(this@TabActivity, R.drawable.footprint)
+            2 -> ContextCompat.getDrawable(this@TabActivity, R.drawable.rocket)
+            else -> throw RuntimeException("Unknown position")
+        }
     }
 
     private fun setBtFilters() {
@@ -458,7 +550,7 @@ class TabActivity : AppCompatActivity() {
 
     private fun writeToArduino() {
         try {
-            val out = "$_key#$_reverse_l#$_reverse_r#$_speed_1#$_speed_2\r\n"
+            val out = "$_key#$_reverse_l#$_reverse_r#$_speed_mode\r\n"
             if (mode == Constants.DOCK) {
                 usbService?.write(out.toByteArray())
             }
@@ -475,8 +567,13 @@ class TabActivity : AppCompatActivity() {
         startActivity()
         _key = 1
         writeToArduino()
+
+        btnChangeMode.visibility = View.GONE
         utilityLay.visibility = View.VISIBLE
+        llMode.visibility = View.VISIBLE
+
     }
+
 
     fun wheelChairStop() {
         //hit api
@@ -484,21 +581,24 @@ class TabActivity : AppCompatActivity() {
         _key = 0
         _reverse_l = 0
         _reverse_r = 0
-        _speed_1 = 0
-        _speed_2 = 0
+        _speed_mode = 1
+        imageTextToggleSwitch.setCheckedPosition(1)
 
         writeToArduino()
+
         utilityLay.visibility = View.GONE
+        llMode.visibility = View.GONE
         forward.visibility = View.GONE
         headlights_off.visibility = View.GONE
 
+        btnChangeMode.visibility = View.VISIBLE
         reverse.visibility = View.VISIBLE
         headlights.visibility = View.VISIBLE
     }
 
     private fun startActivity() {
+        val vehicle = ServiceBuilder.logged_user?.vehicle ?: return
         val currentTime = LocalTime.now()
-        val vehicle = ServiceBuilder.logged_user?.vehicle
         val startTime = currentTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM))
         val getActivityInstance = WheelDB.getinstance(this@TabActivity).getStartActivityDao()
 
@@ -543,7 +643,12 @@ class TabActivity : AppCompatActivity() {
                     currentTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM))
                 val distance = 5
                 val speed = 30
-                val endActivity = EndActivity(startTime!!, vehicle!!, endTime, speed, distance)
+                var endActivity: EndActivity
+                try{
+                    endActivity = EndActivity(startTime!!, vehicle!!, endTime, speed, distance)
+                }catch(e:Exception){
+                    return@launch
+                }
                 val response = ActivityRespository().endActivity(endActivity)
 
                 withContext(Dispatchers.Main) {
@@ -646,8 +751,7 @@ class TabActivity : AppCompatActivity() {
         var _key = 0
         var _reverse_l = 0
         var _reverse_r = 0
-        var _speed_1 = 0
-        var _speed_2 = 0
+        var _speed_mode = 1
 
 
         const val CONNECTING_STATUS = 1 // used in bluetooth handler to identify message status

@@ -122,9 +122,9 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
             val res = degreeToSpeed(angle, strength, safe_degree = 10)
             try{
                 val ta = TabActivity
-                ta._speed_1 = res.elementAtOrNull(0)!!
-                ta._speed_2 = res.elementAt(1)
-                val out = "${ta._key}#${ta._reverse_l}#${ta._reverse_r}#${ta._speed_1}#${ta._speed_2}\r\n"
+//                ta._speed_1 = res.elementAtOrNull(0)!!
+//                ta._speed_2 = res.elementAt(1)
+                val out = "${ta._key}#${ta._reverse_l}#${ta._reverse_r}#${ta._speed_mode}\r\n"
                 val ct = ta.connectedThread
 
                 ct!!.write(out)

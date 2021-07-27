@@ -169,13 +169,22 @@ class MapsFragment : Fragment() {
                         } catch (e: java.lang.Exception) {
                             e.printStackTrace()
                         }
-                        sendSMS(
-                            ServiceBuilder.logged_user?.emContact.toString(),
-                            "!!!EMERGENCY!!!\n" +
-                                    "Latitude: ${current_location!!.latitude} , Longitude: ${current_location!!.longitude}\n" +
-                                    "Address: ${current_address}\n" +
-                                    "http://www.google.com/maps/place/${current_location!!.latitude},${current_location!!.longitude}"
-                        )
+                        if(ServiceBuilder.logged_user?.emContact== null){
+                            Toast.makeText(context, "Emergency contact not found", Toast.LENGTH_SHORT).show()
+                        }else{
+                            if(current_location == null){
+                                Toast.makeText(context, "Make sure your GPS is enabled.", Toast.LENGTH_SHORT).show()
+                            }else{
+                                sendSMS(
+                                    ServiceBuilder.logged_user?.emContact.toString(),
+                                    "!!!EMERGENCY!!!\n" +
+                                            "Latitude: ${current_location!!.latitude} , Longitude: ${current_location!!.longitude}\n" +
+                                            "Address: ${current_address}\n" +
+                                            "http://www.google.com/maps/place/${current_location!!.latitude},${current_location!!.longitude}"
+                                )
+                            }
+                        }
+
                     } else {
                         Toast.makeText(
                             requireActivity(),
@@ -275,13 +284,19 @@ class MapsFragment : Fragment() {
     }
 
     private fun tracker(coordinates: Array<Double>) {
+        val userDetail = ServiceBuilder.logged_user ?: return
         val getTrackerInstance = WheelDB.getinstance(requireContext()).getTrackerDao()
-        val userDetail = ServiceBuilder.logged_user
-        val tracker = Tracker(
-            userDetail?.userid!!,
-            userDetail.vehicle!!,
-            Coordinates(coordinates)
-        )
+        var tracker: Tracker
+        try{
+            tracker = Tracker(
+                userDetail?.userid!!,
+                userDetail.vehicle!!,
+                Coordinates(coordinates)
+            )
+        }catch (e: Exception){
+            return
+        }
+
 
         CoroutineScope(Dispatchers.IO).launch {
 //            try {
@@ -317,22 +332,27 @@ class MapsFragment : Fragment() {
     }
 
     private fun getLocationAddress(loc: Location): String {
-        val gcd = Geocoder(context, Locale.getDefault())
-        var _current_address = ""
-        val addresses: List<Address>
-        try {
-            addresses = gcd.getFromLocation(
-                loc.latitude,
-                loc.longitude, 1
-            )
-            if (addresses.isNotEmpty()) {
-                println(addresses[0].locality)
-                _current_address = addresses[0].locality
+        try{
+            val gcd = Geocoder(context, Locale.getDefault())
+            var _current_address = ""
+            val addresses: List<Address>
+            try {
+                addresses = gcd.getFromLocation(
+                    loc.latitude,
+                    loc.longitude, 1
+                )
+                if (addresses.isNotEmpty()) {
+                    println(addresses[0].locality)
+                    _current_address = addresses[0].locality
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
             }
-        } catch (e: IOException) {
-            e.printStackTrace()
+            return _current_address
+        }catch (e:java.lang.Exception){
+            return "Unknown"
         }
-        return _current_address
+
     }
 
     //     sms
@@ -369,7 +389,12 @@ class MapsFragment : Fragment() {
         requireActivity().registerReceiver(sendBroadcastReceiver, IntentFilter(SENT))
         requireActivity().registerReceiver(deliveryBroadcastReciever, IntentFilter(DELIVERED))
         val sms = SmsManager.getDefault()
-        sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI)
+        try{
+            sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI)
+        }catch (e:Exception){
+            Toast.makeText(activity, "Make sure your service is available and location enabled.", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     internal class SentReceiver : BroadcastReceiver() {
