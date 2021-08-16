@@ -10,6 +10,7 @@
         tools:context=".OptionScreenActivity">
 
     <LinearLayout
+
             app:layout_constraintHeight_percent="1"
             app:layout_constraintWidth_percent="0.5"
             android:layout_width="0dp"
@@ -20,27 +21,30 @@
             android:id="@+id/linearLayout">
 
         <TextView
+                android:background="@color/teal_200"
                 android:padding="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Docking Mode"
                 android:textSize="18dp"
                 android:gravity="center"
-                android:textColor="#808080"
+                android:textColor="@color/darkTextColor"
+                android:textStyle="bold"
                 android:textAlignment="center" />
 
         <ImageButton
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:backgroundTint="@color/teal_200"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_phone_charge"
                 android:background="@color/white"
                 android:id="@+id/dockmode"
-
                 android:layout_gravity="center" />
     </LinearLayout>
 
     <LinearLayout
-
+            android:id="@+id/linearLayoutBt"
             app:layout_constraintHeight_percent="1"
             app:layout_constraintWidth_percent="0.5"
             android:layout_width="0dp"
@@ -50,15 +54,19 @@
             app:layout_constraintStart_toEndOf="@+id/linearLayout">
 
         <TextView
+                android:background="@color/gray_very_light"
                 android:padding="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Remote Control"
                 android:textSize="18dp"
-                android:textColor="#808080"
+                android:textColor="@color/darkTextColor"
+                android:textStyle="bold"
                 android:textAlignment="center" />
 
         <ImageButton
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:backgroundTint="@color/gray_very_light"
                 android:textColor="#808080"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

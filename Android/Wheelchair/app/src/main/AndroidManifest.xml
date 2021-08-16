@@ -33,13 +33,18 @@
             android:usesCleartextTraffic="true"
             android:supportsRtl="true"
             android:theme="@style/Theme.WheelchairApp">
-        <activity android:name=".ui.main.Auth.LoginActivity">
+        <activity android:name=".ui.main.Auth.LoginActivity"
+                android:configChanges="orientation|keyboardHidden|screenSize"
+                >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".OptionScreenActivity">
+        <activity android:name=".OptionScreenActivity"
+
+                android:configChanges="orientation|keyboardHidden|screenSize"
+                >
         </activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
