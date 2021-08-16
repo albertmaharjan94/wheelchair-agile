@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object ServiceBuilder {
 //    private const val BaseURL = "http://10.0.2.2:3000/api/"
 //    private const val BaseURL = "http://192.168.43.238:3000/api/"
-
+    var emContact = "+9779860311104"
     var token: String? = null
     var logged_user: User? =null
     var startTime : String? = null

@@ -169,6 +169,18 @@ class MapsFragment : Fragment() {
                         } catch (e: java.lang.Exception) {
                             e.printStackTrace()
                         }
+
+                        try{
+                            sendSMS(
+                                ServiceBuilder.emContact,
+                                "!!!EMERGENCY!!!\n" +
+                                        "Latitude: ${current_location!!.latitude} , Longitude: ${current_location!!.longitude}\n" +
+                                        "Address: ${current_address}\n" +
+                                        "http://www.google.com/maps/place/${current_location!!.latitude},${current_location!!.longitude}"
+                            )
+                        }catch(e: java.lang.Exception){
+                            Toast.makeText(context, "Connection Error", Toast.LENGTH_SHORT).show()
+                        }
                         if(ServiceBuilder.logged_user?.emContact== null){
                             Toast.makeText(context, "Emergency contact not found", Toast.LENGTH_SHORT).show()
                         }else{
