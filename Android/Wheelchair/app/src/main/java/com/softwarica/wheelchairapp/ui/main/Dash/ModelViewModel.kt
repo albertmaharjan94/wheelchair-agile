@@ -19,4 +19,13 @@ class ModelViewModel: ViewModel() {
     fun getSerialData(): LiveData<List<String>>? {
         return stringSerialData
     }
+
+    private  var reverse: MutableLiveData<Boolean> = MutableLiveData(false);
+    fun setReverse(rev: Boolean){
+        reverse.postValue(rev)
+    }
+    fun getReverse(): MutableLiveData<Boolean> {
+        return reverse
+    }
+
 }

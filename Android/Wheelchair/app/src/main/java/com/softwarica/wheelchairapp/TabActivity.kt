@@ -4,26 +4,25 @@ import android.app.ProgressDialog
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.*
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.opengl.Visibility
 import android.os.*
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
-import android.view.ViewGroup.MarginLayoutParams
 import android.widget.*
-import android.widget.RelativeLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
+import androidx.viewpager.widget.ViewPager
 import br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
 import com.google.android.material.tabs.TabLayout
 import com.llollox.androidtoggleswitch.widgets.ToggleSwitch
 import com.llollox.androidtoggleswitch.widgets.ToggleSwitchButton
 import com.softwarica.wheelchairapp.Utils.Constants
-import com.softwarica.wheelchairapp.ViewPager.CustomViewPager
 import com.softwarica.wheelchairapp.network.api.ConnectivityReceiver
 import com.softwarica.wheelchairapp.network.api.ServiceBuilder
 import com.softwarica.wheelchairapp.network.database_conf.WheelDB
@@ -60,14 +59,14 @@ class TabActivity : AppCompatActivity() {
     private lateinit var txtDebugger: TextView
     private var bt_status = false
     private var modelViewModel: ModelViewModel? = null
-
+    private var relativeLayout: RelativeLayout? = null
     var mode: String? = null
     var progress: ProgressDialog? = null
     private var usbService: UsbService? = null
     private val uHandler = UsbHandler(this)
     private val bHandler = BluetoothHandler(this)
-
-
+    private var view_pager: ViewPager? = null
+    private var tabParent: FrameLayout? = null
 
     private val usbConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(arg0: ComponentName, arg1: IBinder) {
@@ -77,6 +76,66 @@ class TabActivity : AppCompatActivity() {
 
         override fun onServiceDisconnected(arg0: ComponentName) {
             usbService = null
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            configLandScape()
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+            configPortrait()
+        }
+    }
+
+    private fun configLandScape() {
+        view_pager?.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            this.width =0
+            this.height = ConstraintLayout.LayoutParams.MATCH_PARENT
+            this.topToTop = view_pager!!.parent.hashCode()
+            this.startToEnd = view_pager!!.parent.hashCode()
+            this.matchConstraintPercentWidth = 0.5f
+            this.matchConstraintPercentHeight= 1f
+            this.horizontalChainStyle = ConstraintLayout.LayoutParams.CHAIN_PACKED
+            this.matchConstraintDefaultWidth = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT_PERCENT
+        }
+        relativeLayout?.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            this.width =0
+            this.height = ConstraintLayout.LayoutParams.MATCH_PARENT
+            this.topToTop = relativeLayout!!.parent.hashCode()
+            this.startToEnd =view_pager!!.id
+            this.matchConstraintPercentWidth = 0.5f
+            this.matchConstraintPercentHeight= 1f
+            this.horizontalChainStyle = ConstraintLayout.LayoutParams.CHAIN_PACKED
+            this.matchConstraintDefaultWidth = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT_PERCENT
+        }
+    }
+
+    fun configPortrait(){
+        view_pager?.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            this.width =ConstraintLayout.LayoutParams.MATCH_PARENT
+            this.height = 0
+            this.topToTop = view_pager!!.parent.hashCode()
+            this.startToEnd = view_pager!!.parent.hashCode()
+            this.matchConstraintPercentWidth = 1f
+            this.matchConstraintPercentHeight= 0.5f
+            this.verticalChainStyle = ConstraintLayout.LayoutParams.CHAIN_PACKED
+            this.matchConstraintDefaultHeight= ConstraintLayout.LayoutParams.MATCH_CONSTRAINT_PERCENT
+            this.matchConstraintDefaultWidth = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT_PERCENT
+        }
+
+        relativeLayout?.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            this.width =ConstraintLayout.LayoutParams.MATCH_PARENT
+            this.height = 0
+            this.topToTop = ConstraintLayout.LayoutParams.UNSET
+            this.topToBottom = view_pager!!.id
+            this.startToEnd = relativeLayout!!.parent.hashCode()
+            this.matchConstraintPercentWidth = 1f
+            this.verticalChainStyle = ConstraintLayout.LayoutParams.CHAIN_PACKED
+            this.matchConstraintPercentHeight= 0.5f
+            this.matchConstraintDefaultHeight= ConstraintLayout.LayoutParams.MATCH_CONSTRAINT_PERCENT
+            this.matchConstraintDefaultWidth = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT_PERCENT
         }
     }
 
@@ -146,9 +205,14 @@ class TabActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        if (mode == Constants.DOCK) {
-            unregisterReceiver(mUsbReceiver)
-            unbindService(usbConnection)
+        try{
+
+            if (mode == Constants.DOCK) {
+                unregisterReceiver(mUsbReceiver)
+                unbindService(usbConnection)
+            }
+        }catch (e: java.lang.Exception){
+            e.printStackTrace()
         }
     }
 
@@ -156,6 +220,7 @@ class TabActivity : AppCompatActivity() {
         super.onDestroy()
         try{
             unregisterReceiver(mReceiver)
+            connectedThread?.cancel()
         }catch (e:java.lang.Exception){
             e.printStackTrace()
         }
@@ -270,16 +335,28 @@ class TabActivity : AppCompatActivity() {
     }
 
     fun viewInit() {
+        tabParent = findViewById(R.id.tabParent)
         val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager, mode!!)
-        val viewPager: CustomViewPager = findViewById(R.id.view_pager)
-        viewPager.adapter = sectionsPagerAdapter
+        relativeLayout = findViewById(R.id.relativeLayout)
+        view_pager = findViewById(R.id.view_pager)
+
+        val orientation = resources.configuration.orientation
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            // In landscape
+            configLandScape()
+        } else {
+            // In portrait
+            configPortrait()
+        }
+
+        view_pager?.adapter = sectionsPagerAdapter
 
         modelViewModel = ViewModelProvider(this).get(ModelViewModel::class.java)
         modelViewModel!!.init()
 
-        val tabs: TabLayout = findViewById(R.id.tabs)
+        var tabs: TabLayout = findViewById(R.id.tabs)
 
-        tabs.setupWithViewPager(viewPager)
+        tabs.setupWithViewPager(view_pager)
 
         utilityLay = findViewById(R.id.utilityLay)
 
@@ -293,13 +370,29 @@ class TabActivity : AppCompatActivity() {
         connectLay = findViewById(R.id.connectLay)
         btnChangeMode = findViewById(R.id.btnChangeMode)
         imageTextToggleSwitch = findViewById(R.id.imageTextToggleSwitch)
+        modelViewModel!!.getReverse().observe(this, { data ->
+            if(data == true){
+                forward.visibility = View.VISIBLE; reverse.visibility = View.GONE;
+            }else{
 
+                forward.visibility = View.GONE; reverse.visibility = View.VISIBLE;
+            }
+
+        })
         btnChangeMode.setOnClickListener{
             AlertDialog.Builder(this@TabActivity)
                 .setTitle("Change Mode")
                 .setMessage("Are you sure you want to change the mode")
                 .setPositiveButton("Okay") { dialog, id ->
                     startActivity(Intent(this@TabActivity, OptionScreenActivity::class.java))
+                    try{
+                        unregisterReceiver(mUsbReceiver)
+                        unbindService(usbConnection)
+                        unregisterReceiver((mReceiver))
+                        connectedThread?.cancel()
+                    }catch (e: java.lang.Exception){
+                        e.printStackTrace()
+                    }
                     finish()
                 }
                 .setNegativeButton("Cancel") { dialog, id ->
@@ -365,6 +458,12 @@ class TabActivity : AppCompatActivity() {
 
         imageTextToggleSwitch.onChangeListener = object : ToggleSwitch.OnChangeListener {
             override fun onToggleSwitchChanged(position: Int) {
+                _speed_mode = position
+                try{
+                    writeToArduino()
+                }catch(e: java.lang.Exception){
+                    e.printStackTrace()
+                }
 
             }
         }
@@ -526,14 +625,14 @@ class TabActivity : AppCompatActivity() {
             "FWD" -> {
                 forward.visibility = View.GONE
                 reverse.visibility = View.VISIBLE
-                _reverse_l = 0
-                _reverse_r = 0
+                _reverse = 0
+                _d_pad = 0
                 writeToArduino()
             }
             "REV" -> {
                 forward.visibility = View.VISIBLE; reverse.visibility = View.GONE;
-                _reverse_l = 1
-                _reverse_r = 1
+                _reverse = 1
+                _d_pad = 1
                 writeToArduino()
             }
             "HDON" -> {
@@ -550,7 +649,8 @@ class TabActivity : AppCompatActivity() {
 
     private fun writeToArduino() {
         try {
-            val out = "$_key#$_reverse_l#$_reverse_r#$_speed_mode\r\n"
+            val out = "$_key#$_reverse#$_speed_mode#$_d_pad\r\n"
+            Log.d("Arduino out", out)
             if (mode == Constants.DOCK) {
                 usbService?.write(out.toByteArray())
             }
@@ -579,9 +679,10 @@ class TabActivity : AppCompatActivity() {
         //hit api
         endActivity()
         _key = 0
-        _reverse_l = 0
-        _reverse_r = 0
+        _reverse = 0
         _speed_mode = 1
+        _d_pad = 0
+
         imageTextToggleSwitch.setCheckedPosition(1)
 
         writeToArduino()
@@ -749,9 +850,9 @@ class TabActivity : AppCompatActivity() {
 
     companion object {
         var _key = 0
-        var _reverse_l = 0
-        var _reverse_r = 0
+        var _reverse = 0
         var _speed_mode = 1
+        var _d_pad = 0
 
 
         const val CONNECTING_STATUS = 1 // used in bluetooth handler to identify message status

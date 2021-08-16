@@ -5,6 +5,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:id="@+id/tabParent"
         tools:context=".TabActivity">
     <RelativeLayout
             android:layout_width="match_parent"
@@ -74,26 +75,31 @@
                 app:layout_constraintHeight_default="spread"
                 app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
                 android:layout_height="0dp">
+
             <com.softwarica.wheelchairapp.ViewPager.CustomViewPager
                     android:id="@+id/view_pager"
-                    android:layout_height="0dp"
-                    app:layout_constraintHeight_default="percent"
-                    app:layout_constraintHeight_percent="0.5"
-                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintWidth_default="percent"
+                    app:layout_constraintWidth_percent="0.5"
+                    android:layout_width="0dp"
+                    app:layout_constraintHorizontal_chainStyle="packed"
                     android:background="@color/white"
                     android:backgroundTint="@color/white"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
 
             <RelativeLayout
                     android:animateLayoutChanges="true"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
+                    app:layout_constraintWidth_percent="0.5"
                     android:background="@color/white"
                     android:backgroundTint="#E1F2FE"
-                    app:layout_constraintTop_toBottomOf="@+id/view_pager"
-                    android:layout_height="0dp"
+                    android:layout_height="match_parent"
                     app:layout_constraintHeight_default="percent"
                     app:layout_constraintHeight_percent="0.5"
-                    android:id="@+id/relativeLayout">
+                    android:id="@+id/relativeLayout"
+                    app:layout_constraintStart_toEndOf="@+id/view_pager"
+                    app:layout_constraintTop_toTopOf="parent">
 
 
                 <TextView
@@ -101,7 +107,7 @@
                         android:layout_height="wrap_content"
                         android:textAlignment="center"
                         android:text="Not Connected"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="20dp"
                         android:fontFamily="@font/lato"
                         android:textColor="@color/black"
                         android:id="@+id/connTxt"
@@ -144,6 +150,7 @@
                         android:layout_gravity="center_horizontal"
                         android:layout_centerHorizontal="true"
                         android:layout_height="40dp" />
+
                 <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -203,6 +210,7 @@
                         android:orientation="vertical"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:visibility="gone"
                         android:layout_centerHorizontal="true"
                         android:layout_alignParentBottom="true">
 
@@ -210,7 +218,7 @@
                             android:id="@+id/imageTextToggleSwitch"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:toggleHeight="60dp" />
+                            app:toggleHeight="80dp" />
                 </LinearLayout>
 
 

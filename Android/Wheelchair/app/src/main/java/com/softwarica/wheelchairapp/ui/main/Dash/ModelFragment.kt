@@ -118,21 +118,47 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
 
         jsFirst = view.findViewById(R.id.jsFirst)
         txtLog = view.findViewById(R.id.txtLog)
+
+        var sharedViewModel = ViewModelProvider(requireActivity()).get(ModelViewModel::class.java)
         jsFirst.setOnMoveListener(JoystickView.OnMoveListener { angle, strength ->
-            val res = degreeToSpeed(angle, strength, safe_degree = 10)
+            Log.d("Dpad angle", angle.toString())
+//            val res = degreeToSpeed(angle, strength, safe_degree = 10)
+
+            val ta = TabActivity
             try{
-                val ta = TabActivity
-//                ta._speed_1 = res.elementAtOrNull(0)!!
-//                ta._speed_2 = res.elementAt(1)
-                val out = "${ta._key}#${ta._reverse_l}#${ta._reverse_r}#${ta._speed_mode}\r\n"
+                if(strength > 40){
+                    when (angle) {
+                        in 0..180 -> {
+                            ta._d_pad = 100
+                            ta._reverse = 0
+                            sharedViewModel.setReverse(false)
+                        }
+                        in 181..360 -> {
+                            ta._d_pad = -100
+                            ta._reverse = 1
+                            sharedViewModel.setReverse(true)
+                        }
+                        else -> {
+                            ta._reverse = 0
+                            ta._d_pad = 0
+                            sharedViewModel.setReverse(false)
+                        }
+                    }
+                }else{
+                    ta._d_pad = 0
+                    sharedViewModel.setReverse(false)
+                }
+
+                val out = "${ta._key}#${ta._reverse}#${ta._speed_mode}#${ta._d_pad}\r\n"
                 val ct = ta.connectedThread
 
                 ct!!.write(out)
             }catch (e: Exception){
+                ta._d_pad = 0
                 print(e.stackTrace)
             }
 
-            txtLog.text = "$res"
+            txtLog.text = "$angle $strength"
         })
 
         var mode = ""
