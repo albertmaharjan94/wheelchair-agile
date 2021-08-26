@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/tabParent"
+        tools:context=".TabActivity">
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#E3000000"
+            android:id="@+id/connectLay"
+            android:clickable="true"
+            android:visibility="gone"
+            android:translationZ="90dp"
+            >
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_alignParentBottom="true"
+                >
+            <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/leftAnim"
+                    android:layout_width="match_parent"
+                    android:layout_height="500dp"
+                    app:lottie_rawRes="@raw/connect"
+                    android:layout_centerVertical="true"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"/>
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/connectTxt"
+                    android:fontFamily="@font/lato"
+                    android:textColor="@color/white"
+                    android:text="Connect Your Device"
+                    android:textAlignment="center"
+                    android:paddingBottom="30dp"
+                    android:textSize="20dp"
+                    />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="fill_parent"
+            android:orientation="vertical"
+            android:layout_height="fill_parent"
+            >
+
+        <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/Theme.Design.Light"
+                app:layout_constraintTop_toTopOf="parent"
+                android:id="@+id/appBarLayout">
+
+
+            <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tabs"
+                    android:layout_width="match_parent"
+                    app:tabIndicatorColor="@color/black"
+                    app:tabSelectedTextColor="#808080"
+                    app:tabTextColor="@color/black"
+                    android:layout_height="wrap_content" />
+        </com.google.android.material.appbar.AppBarLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintWidth_default="wrap"
+                app:layout_constraintHeight_default="spread"
+                app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
+                android:layout_height="0dp">
+
+            <com.softwarica.wheelchairapp.ViewPager.CustomViewPager
+                    android:id="@+id/view_pager"
+                    android:layout_height="match_parent"
+                    app:layout_constraintWidth_default="percent"
+                    app:layout_constraintWidth_percent="0.5"
+                    android:layout_width="0dp"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    android:background="@color/white"
+                    android:backgroundTint="@color/white"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+            <RelativeLayout
+                    android:animateLayoutChanges="true"
+                    android:layout_width="0dp"
+                    app:layout_constraintWidth_percent="0.5"
+                    android:background="@color/white"
+                    android:backgroundTint="#E1F2FE"
+                    android:layout_height="match_parent"
+                    app:layout_constraintHeight_default="percent"
+                    app:layout_constraintHeight_percent="0.5"
+                    android:id="@+id/relativeLayout"
+                    app:layout_constraintStart_toEndOf="@+id/view_pager"
+                    app:layout_constraintTop_toTopOf="parent">
+
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:text="Not Connected"
+                        android:layout_marginTop="20dp"
+                        android:fontFamily="@font/lato"
+                        android:textColor="@color/black"
+                        android:id="@+id/connTxt"
+                        android:layout_marginBottom="20dp" />
+
+
+                <io.ghyeok.stickyswitch.widget.StickySwitch
+                        android:id="@+id/startbtn"
+                        android:animateLayoutChanges="true"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_below="@+id/connTxt"
+                        android:layout_centerHorizontal="true"
+                        app:ss_animationDuration="600"
+                        app:ss_iconPadding="18dp"
+                        app:ss_iconSize="22dp"
+                        app:ss_leftIcon="@drawable/ic_power_button"
+                        app:ss_leftText="OFF"
+                        app:ss_rightIcon="@drawable/ic_power"
+                        app:ss_rightText="ON"
+                        app:ss_selectedTextSize="14sp"
+                        app:ss_sliderBackgroundColor="#84A9C0"
+                        app:ss_switchColor="#4C7994"
+                        app:ss_textColor="@color/black"
+                        app:ss_textSize="12sp"
+                        app:ss_animationType="line" />
+
+                <br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
+                        android:id="@+id/btnChangeMode"
+                        android:layout_width="200dp"
+                        android:text="Switch Mode"
+                        style="@style/loginButton"
+                        android:textStyle="normal"
+                        android:layout_marginTop="20dp"
+                        app:spinning_bar_width="4dp"
+                        app:spinning_bar_color="#FFF"
+                        android:layout_below="@+id/startbtn"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_centerHorizontal="true"
+                        android:layout_height="40dp" />
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/startbtn"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="20dp"
+                        android:id="@+id/utilityLay"
+                        android:visibility="gone">
+
+                    <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_arrow_loop"
+                            android:backgroundTint="#E1F2FE"
+                            android:id="@+id/reverse"
+                            android:layout_weight="1" />
+
+                    <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_forward"
+                            android:backgroundTint="#E1F2FE"
+                            android:visibility="gone"
+                            android:id="@+id/forward"
+                            android:layout_weight="1" />
+
+                    <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_headlight_on"
+                            android:backgroundTint="#E1F2FE"
+                            android:id="@+id/headlights"
+                            android:layout_weight="1" />
+
+                    <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_headlight__off"
+                            android:backgroundTint="#E1F2FE"
+                            android:id="@+id/headlights_off"
+                            android:visibility="gone"
+                            android:layout_weight="1" />
+                </LinearLayout>
+
+                <TextView
+                        android:text="Debug Here"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/txtDebugger"
+                        android:layout_marginBottom="110dp"
+                        android:layout_alignBottom="@+id/startbtn"
+                        android:layout_marginTop="43dp"
+                        android:layout_alignParentTop="true" />
+
+                <LinearLayout
+                        android:id="@+id/llMode"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:layout_centerHorizontal="true"
+                        android:layout_alignParentBottom="true">
+
+                    <com.llollox.androidtoggleswitch.widgets.ToggleSwitch
+                            android:id="@+id/imageTextToggleSwitch"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:toggleHeight="80dp" />
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

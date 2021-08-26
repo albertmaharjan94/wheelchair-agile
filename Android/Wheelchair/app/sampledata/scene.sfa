@@ -1,0 +1,337 @@
+{
+  materials: [
+    {
+      name: 'tire',
+      parameters: [
+        {
+          baseColorFactor: [
+            0.024808,
+            0.024808,
+            0.024808,
+            1,
+          ],
+        },
+        {
+          baseColor: null,
+        },
+        {
+          diffuseColorFactor: null,
+        },
+        {
+          diffuseColor: null,
+        },
+        {
+          normal: null,
+        },
+        {
+          metallicFactor: 0,
+        },
+        {
+          roughnessFactor: 0.78099200000000002,
+        },
+        {
+          specularFactor: null,
+        },
+        {
+          glossinessFactor: null,
+        },
+        {
+          specularGlossiness: null,
+        },
+        {
+          specularGlossinessCalculation: null,
+        },
+        {
+          metallicRoughness: null,
+        },
+        {
+          occlusion: null,
+        },
+        {
+          emissiveFactor: [
+            0,
+            0,
+            0,
+            1,
+          ],
+        },
+        {
+          emissive: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/gltf_material.sfm',
+    },
+    {
+      name: 'wheelchair_plastic',
+      parameters: [
+        {
+          baseColorFactor: [
+            0.020792000000000001,
+            0.020792000000000001,
+            0.020792000000000001,
+            1,
+          ],
+        },
+        {
+          baseColor: null,
+        },
+        {
+          diffuseColorFactor: null,
+        },
+        {
+          diffuseColor: null,
+        },
+        {
+          normal: null,
+        },
+        {
+          metallicFactor: 0,
+        },
+        {
+          roughnessFactor: 0.21074399999999999,
+        },
+        {
+          specularFactor: null,
+        },
+        {
+          glossinessFactor: null,
+        },
+        {
+          specularGlossiness: null,
+        },
+        {
+          specularGlossinessCalculation: null,
+        },
+        {
+          metallicRoughness: null,
+        },
+        {
+          occlusion: null,
+        },
+        {
+          emissiveFactor: [
+            0,
+            0,
+            0,
+            1,
+          ],
+        },
+        {
+          emissive: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/gltf_material.sfm',
+    },
+    {
+      name: 'wheelchair_metal',
+      parameters: [
+        {
+          baseColorFactor: [
+            0.53720999999999997,
+            0.53720999999999997,
+            0.53720999999999997,
+            1,
+          ],
+        },
+        {
+          baseColor: null,
+        },
+        {
+          diffuseColorFactor: null,
+        },
+        {
+          diffuseColor: null,
+        },
+        {
+          normal: null,
+        },
+        {
+          metallicFactor: 0.82644600000000001,
+        },
+        {
+          roughnessFactor: 0.086777000000000007,
+        },
+        {
+          specularFactor: null,
+        },
+        {
+          glossinessFactor: null,
+        },
+        {
+          specularGlossiness: null,
+        },
+        {
+          specularGlossinessCalculation: null,
+        },
+        {
+          metallicRoughness: null,
+        },
+        {
+          occlusion: null,
+        },
+        {
+          emissiveFactor: [
+            0,
+            0,
+            0,
+            1,
+          ],
+        },
+        {
+          emissive: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/gltf_material.sfm',
+    },
+    {
+      name: 'wheelchair_seat',
+      parameters: [
+        {
+          baseColorFactor: [
+            0.067382999999999998,
+            0.090726000000000001,
+            0.22661999999999999,
+            1,
+          ],
+        },
+        {
+          baseColor: null,
+        },
+        {
+          diffuseColorFactor: null,
+        },
+        {
+          diffuseColor: null,
+        },
+        {
+          normal: null,
+        },
+        {
+          metallicFactor: 0,
+        },
+        {
+          roughnessFactor: 0.28512399999999999,
+        },
+        {
+          specularFactor: null,
+        },
+        {
+          glossinessFactor: null,
+        },
+        {
+          specularGlossiness: null,
+        },
+        {
+          specularGlossinessCalculation: null,
+        },
+        {
+          metallicRoughness: null,
+        },
+        {
+          occlusion: null,
+        },
+        {
+          emissiveFactor: [
+            0,
+            0,
+            0,
+            1,
+          ],
+        },
+        {
+          emissive: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/gltf_material.sfm',
+    },
+    {
+      name: 'material_0',
+      parameters: [
+        {
+          baseColorFactor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColor: null,
+        },
+        {
+          diffuseColorFactor: null,
+        },
+        {
+          diffuseColor: null,
+        },
+        {
+          normal: null,
+        },
+        {
+          metallicFactor: 0,
+        },
+        {
+          roughnessFactor: 0.59999999999999998,
+        },
+        {
+          specularFactor: null,
+        },
+        {
+          glossinessFactor: null,
+        },
+        {
+          specularGlossiness: null,
+        },
+        {
+          specularGlossinessCalculation: null,
+        },
+        {
+          metallicRoughness: null,
+        },
+        {
+          occlusion: null,
+        },
+        {
+          emissiveFactor: [
+            0,
+            0,
+            0,
+            1,
+          ],
+        },
+        {
+          emissive: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/gltf_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'TexCoord',
+      'Orientation',
+    ],
+    collision: {},
+    file: 'sampledata/scene.gltf',
+    name: 'scene',
+    recenter: 'root',
+    scale: 0.31477500000000003,
+  },
+  version: '0.54:2',
+}

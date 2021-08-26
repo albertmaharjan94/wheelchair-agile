@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/map"
+        tools:context=".ui.main.Maps.MapsFragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        >
+
+    <com.google.android.gms.maps.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    <Button
+            android:id="@+id/btnEmergency"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|bottom"
+            android:text="Send Emergency text"
+            android:padding="10dp"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/black"
+            android:layout_marginTop="20dp"
+            android:paddingEnd="10dp"/>
+</fragment>

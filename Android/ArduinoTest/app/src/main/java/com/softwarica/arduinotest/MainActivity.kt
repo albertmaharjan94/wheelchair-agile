@@ -1,25 +1,47 @@
 package com.softwarica.arduinotest
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.hardware.usb.UsbManager
-import android.os.Bundle
-import android.util.Log
+import android.content.*
+import android.os.*
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.slider.Slider
 import com.google.android.material.switchmaterial.SwitchMaterial
-import com.physicaloid.lib.Physicaloid
-import com.physicaloid.lib.usb.driver.uart.ReadLisener
-import java.nio.charset.StandardCharsets
+import com.softwarica.arduinotest.service.UsbService
 
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var mPhysicaloid: Physicaloid
+    private val mUsbReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                UsbService.ACTION_USB_PERMISSION_GRANTED ->
+                    txtLog2.text = "USB Ready"
+                UsbService.ACTION_USB_PERMISSION_NOT_GRANTED ->
+                    txtLog2.text = "USB Permission not granted"
+                UsbService.ACTION_NO_USB ->
+                    txtLog2.text = "No USB connected"
+                UsbService.ACTION_USB_DISCONNECTED ->
+                    txtLog2.text = "USB disconnected"
+                UsbService.ACTION_USB_NOT_SUPPORTED ->
+                    txtLog2.text = "USB device not supported"
+            }
+        }
+    }
+    private var usbService: UsbService? = null
+    private val mHandler = MyHandler(this)
+    private val usbConnection: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(arg0: ComponentName, arg1: IBinder) {
+            Toast.makeText(this@MainActivity, "Connected", Toast.LENGTH_SHORT).show()
+            usbService = (arg1 as UsbService.UsbBinder).service
+            usbService!!.setHandler(mHandler)
+        }
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            Toast.makeText(this@MainActivity, "Disconnected", Toast.LENGTH_SHORT).show()
+            usbService = null
+        }
+    }
+
     private lateinit var txtLog: TextView
     private lateinit var txtLog2: TextView
     private lateinit var swKey: SwitchMaterial
@@ -34,47 +56,13 @@ class MainActivity : AppCompatActivity() {
     private var _speed = 0
 
 
-    private lateinit var arduinoThread: Thread
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mPhysicaloid = Physicaloid(this)
-        mPhysicaloid.setBaudrate(9600)
-
         binding()
         event()
-        broadcastUsb()
-        dockMicroController()
 
-//      Debug
-//        CoroutineScope(Dispatchers.IO).launch {
-//            while(true){
-//                Log.d(TAG,"$_key#$_brake#$_rev#$_speed")
-//            }
-//        }
-
-    }
-
-    private fun broadcastUsb() {
-        val detachReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                if (intent.action == UsbManager.ACTION_USB_DEVICE_DETACHED) {
-                    unDockMicroController()
-                    setText(txtLog2, "Not connected.. retrying")
-                } else if (intent.action == UsbManager.ACTION_USB_ACCESSORY_ATTACHED) {
-                    dockMicroController()
-                    setText(txtLog2, "Connected")
-                }
-            }
-        }
-
-        val filter = IntentFilter()
-        filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED)
-        filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
-        filter.addAction("android.hardware.usb.action.USB_STATE")
-        registerReceiver(detachReceiver, filter)
     }
 
 
@@ -90,79 +78,119 @@ class MainActivity : AppCompatActivity() {
     private fun event() {
         swKey.setOnCheckedChangeListener { buttonView, isChecked ->
             _key = if (isChecked) 1 else 0
-            Toast.makeText(this, "Key", Toast.LENGTH_SHORT).show()
-            writeToMicroController()
+            writeToSerial()
         }
         swBrake.setOnCheckedChangeListener { buttonView, isChecked ->
             _brake = if (isChecked) 1 else 0
-            writeToMicroController()
+            writeToSerial()
         }
-        swRev.setOnCheckedChangeListener { buttonView, isChecked ->
+        swRev.setOnCheckedChangeListener { _, isChecked ->
             _rev = if (isChecked) 1 else 0
-            writeToMicroController()
+            writeToSerial()
         }
-        sldSpeed.addOnChangeListener(Slider.OnChangeListener { slider, value, fromUser ->
+        sldSpeed.addOnChangeListener(Slider.OnChangeListener { _, value, _ ->
             _speed = value.toInt()
-            writeToMicroController()
+            writeToSerial()
         })
+    }
+
+    private fun writeToSerial() {
+        if (usbService != null) { // if UsbService was correctly bound, Send data
+            var data = "${_key}#${_brake}#${_rev}#${_speed}\n"
+            usbService!!.write(data.toByteArray())
+        }
     }
 
     private fun setText(text: TextView, value: String) {
         runOnUiThread { text.text = value }
     }
 
-    private fun writeToMicroController() {
-        if (mPhysicaloid.isOpened) {
-            var send = "$_key#$_brake#$_rev#$_speed"
-            val buf: ByteArray = send.toByteArray()
-            mPhysicaloid.write(buf, buf.size)
-        }
-    }
-
-    private fun dockMicroController() {
-        if (mPhysicaloid.open()) {
-            var data = "";
-            Log.d(TAG, "Connected")
-            var full = ""
-            var completed = false
-            // receive data
-            mPhysicaloid.addReadListener(ReadLisener { size ->
-                val buf = ByteArray(1)
-                mPhysicaloid.read(buf)
-                var data = String(buf, StandardCharsets.UTF_8)
-                if(data != "\n") full += data else completed = true
-
-                if(completed){
-                    setText(txtLog, full)
-                    full = ""
-                    completed = false
-                }
-            })
-        } else {
-            Toast.makeText(this, "Muji connect bhayena la", Toast.LENGTH_SHORT).show()
-            setText(txtLog2, "Not connected.. retrying")
-            Log.d(TAG, "Not connected.. retrying")
-        }
-    }
 
     override fun onPause() {
         super.onPause()
-        unDockMicroController()
+        unregisterReceiver(mUsbReceiver)
+        unbindService(usbConnection)
     }
 
     override fun onResume() {
         super.onResume()
-        dockMicroController()
+        setFilters() // Start listening notifications from UsbService
+
+        startService(
+            UsbService::class.java,
+            usbConnection,
+            null
+        )
+
     }
     override fun onDestroy() {
         super.onDestroy()
-        unDockMicroController()
+
     }
 
-    private fun unDockMicroController() {
-        if (mPhysicaloid.isOpened){
-            mPhysicaloid.close()
+    private fun startService(
+        service: Class<*>,
+        serviceConnection: ServiceConnection,
+        extras: Bundle?
+    ) {
+        if (!UsbService.SERVICE_CONNECTED) {
+            val startService = Intent(this, service)
+            if (extras != null && !extras.isEmpty) {
+                val keys = extras.keySet()
+                for (key in keys) {
+                    val extra = extras.getString(key)
+                    startService.putExtra(key, extra)
+                }
+            }
+            startService(startService)
         }
+        val bindingIntent = Intent(this, service)
+        bindService(bindingIntent, serviceConnection, BIND_AUTO_CREATE)
     }
+
+    private fun setFilters() {
+        val filter = IntentFilter()
+        filter.addAction(UsbService.ACTION_USB_PERMISSION_GRANTED)
+        filter.addAction(UsbService.ACTION_NO_USB)
+        filter.addAction(UsbService.ACTION_USB_DISCONNECTED)
+        filter.addAction(UsbService.ACTION_USB_NOT_SUPPORTED)
+        filter.addAction(UsbService.ACTION_USB_PERMISSION_NOT_GRANTED)
+        registerReceiver(mUsbReceiver, filter)
+    }
+
+    private class MyHandler(val activity: MainActivity) : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            when (msg.what) {
+                UsbService.MESSAGE_FROM_SERIAL_PORT -> {
+                    try{
+                        activity.runOnUiThread{
+                            val data = msg.obj.toString()
+                            activity.txtLog.text = data
+                        }
+                    }catch (e:Exception){
+                        e.printStackTrace()
+                    }
+
+                }
+                UsbService.CTS_CHANGE -> Toast.makeText(
+                    activity,
+                    "CTS_CHANGE",
+                    Toast.LENGTH_LONG
+                ).show()
+                UsbService.DSR_CHANGE -> Toast.makeText(
+                    activity,
+                    "DSR_CHANGE",
+                    Toast.LENGTH_LONG
+                ).show()
+                UsbService.SYNC_READ -> {
+                    val buffer = msg.obj as List<String>
+                    val stats = "${buffer[1].trim()} ${buffer[2].trim()} ${buffer[3].trim()} ${buffer[4].trim()}"
+                    activity.txtLog.text = stats
+                }
+            }
+        }
+
+    }
+
 
 }

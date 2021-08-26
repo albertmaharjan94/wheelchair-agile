@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        android:id="@+id/root"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.main.Auth.LoginActivity"
+        android:background="@color/login_bk_color"
+        android:focusableInTouchMode="true"
+        android:gravity="center"
+        android:layout_gravity="center">
+
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true">
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+            <ImageButton
+                    android:layout_marginBottom="40dp"
+                    android:id="@+id/btnDebug"
+                    android:background="@null"
+                    android:layout_height="50dp"
+                    android:layout_width="50dp" />
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"
+                        style="@style/viewParent.headerText.NoMode"
+                        android:text="Welcome to \nMobility \nWheelchair"/>
+
+                <ImageView
+                        android:layout_width="206dp"
+                        android:layout_height="250dp"
+                        android:src="@drawable/wheel"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"/>
+            </RelativeLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputEmail"
+                    style="@style/parent"
+                    app:hintTextColor="#111"
+                    android:textColorHint="#111"
+                    android:layout_marginTop="@dimen/loginViewsMargin">
+                <EditText
+                        android:id="@+id/usernametxt"
+                        style="@style/modifiedEditText"
+                        android:inputType="textEmailAddress"
+                        android:maxLines="1"
+                        android:textColorLink="#111"
+                        android:textColor="#111"
+                        android:textColorHint="#111"
+                        android:hint="@string/login_email_hint"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputPassword"
+                    style="@style/parent"
+                    android:textColorHint="#111"
+                    app:hintTextColor="#111"
+                    app:passwordToggleEnabled="true"
+                    android:layout_marginTop="@dimen/loginViewsMargin">
+                <EditText
+                        android:textColor="#111"
+                        android:textColorLink="#111"
+                        android:id="@+id/passwordtxt"
+                        style="@style/modifiedEditText"
+                        android:hint="@string/login_password_hint"
+                        android:maxLines="1"
+                        android:textColorHint="#111"
+                        android:inputType="textPassword"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                    style="@style/viewParent"
+                    android:text="Forgot Password?"
+                    android:textColor="@color/primaryTextColor"
+                    android:textSize="@dimen/newsMoreTextSize"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="10dp"/>x
+
+            <br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
+                    android:id="@+id/lgnbtn"
+                    style="@style/loginButton"
+                    app:spinning_bar_width="4dp"
+                    app:spinning_bar_color="#FFF"
+                    android:text="Login"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/loginViewsMargin"
+                    app:spinning_bar_padding="6dp"
+                    app:initialCornerAngle="27dp" />
+
+        </LinearLayout>
+    </ScrollView>
+    <View
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="29dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_width="11dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_side_bg"/>
+</RelativeLayout>
+<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--        xmlns:tools="http://schemas.android.com/tools"-->
+<!--        xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:padding="10dp"-->
+<!--        tools:context=".ui.main.Auth.LoginActivity">-->
+
+<!--    <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical"-->
+<!--        android:layout_centerInParent="true"-->
+<!--        >-->
+<!--        <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--            android:textAlignment="center"-->
+<!--            android:text="Login"-->
+<!--            android:textSize="40dp"-->
+<!--                android:fontFamily="@font/lato"-->
+<!--            android:textColor="@color/black"-->
+<!--            android:layout_marginBottom="20dp"-->
+<!--            />-->
+<!--        <com.google.android.material.textfield.TextInputLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+
+<!--            >-->
+<!--            <EditText-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:hint="Username"-->
+<!--                    android:id="@+id/usernametxt"-->
+<!--                    />-->
+<!--        </com.google.android.material.textfield.TextInputLayout>-->
+<!--        <com.google.android.material.textfield.TextInputLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+
+<!--                android:layout_marginTop="10dp"-->
+<!--                app:passwordToggleEnabled="true"-->
+<!--                >-->
+<!--            <EditText-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:id="@+id/passwordtxt"-->
+<!--                    android:hint="Password"-->
+<!--                    />-->
+<!--        </com.google.android.material.textfield.TextInputLayout>-->
+
+<!--        <Button-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                    android:text="Login"-->
+<!--                android:layout_marginTop="40dp"-->
+<!--                android:id="@+id/lgnbtn"-->
+<!--            />-->
+
+<!--    </LinearLayout>-->
+
+<!--    <ImageButton-->
+<!--            android:id="@+id/btnDebug"-->
+<!--            android:background="@null"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_width="40dp" />-->
+<!--    &lt;!&ndash;    <Button&ndash;&gt;-->
+<!--&lt;!&ndash;            android:text="DEBUG"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:layout_width="53dp"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:layout_height="36dp"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:id="@+id/btnDebug"&ndash;&gt;-->
+<!--&lt;!&ndash;            app:iconTint="@color/cardview_shadow_end_color"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:backgroundTint="@color/cardview_shadow_end_color"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:visibility="visible"&ndash;&gt;-->
+<!--&lt;!&ndash;            style="@style/Widget.AppCompat.Button.Borderless" />&ndash;&gt;-->
+
+<!--</RelativeLayout>-->
