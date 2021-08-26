@@ -2,22 +2,16 @@ package com.softwarica.wheelchairapp.ui.main.Dash
 
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
 import android.util.Log
 import android.view.*
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GestureDetectorCompat
 import androidx.dynamicanimation.animation.DynamicAnimation
 import androidx.fragment.app.Fragment
 import androidx.dynamicanimation.animation.FlingAnimation
 import androidx.dynamicanimation.animation.FloatPropertyCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.ar.sceneform.HitTestResult
 import com.google.ar.sceneform.Node
@@ -28,10 +22,11 @@ import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.robinhood.ticker.TickerUtils
 import com.robinhood.ticker.TickerView
+import com.softwarica.wheelchairapp.TablViewModel
 import com.softwarica.wheelchairapp.R
 import com.softwarica.wheelchairapp.TabActivity
 import com.softwarica.wheelchairapp.Utils.Constants
-import io.ghyeok.stickyswitch.widget.StickySwitch
+import com.softwarica.wheelchairapp.ui.main.Maps.MapViewModel
 import io.github.controlwear.virtual.joystick.android.JoystickView
 import java.lang.Exception
 import kotlin.math.abs
@@ -62,7 +57,7 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
 
     private lateinit var jsFirst: JoystickView
     private lateinit var txtLog: TextView
-
+    lateinit var mapViewModel: MapViewModel
 
 
     lateinit var scene : Scene
@@ -86,14 +81,24 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
 
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
         activity?.let { it ->
-            val sharedViewModel = ViewModelProvider(it).get(ModelViewModel::class.java)
-            sharedViewModel.getSerialData()!!.observe(viewLifecycleOwner, { data ->
-                Log.d("Frag", data.toString())
-                speedTxt.text = data[1]
-            })
+//            val sharedViewModel = ViewModelProvider(it).get(TablViewModel::class.java)
+//            sharedViewModel.getSpeed().observe(viewLifecycleOwner, { data ->
+//                Log.d("Speed MODEL", data.toString())
+//                speedTxt.text = data.toString()
+//            })
+//            sharedViewModel.getSerialData()!!.observe(viewLifecycleOwner, { data ->
+//                Log.d("Frag", data.toString())
+//                speedTxt.text = data[1]
+//            })
         }
     }
 
@@ -119,7 +124,12 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
         jsFirst = view.findViewById(R.id.jsFirst)
         txtLog = view.findViewById(R.id.txtLog)
 
-        var sharedViewModel = ViewModelProvider(requireActivity()).get(ModelViewModel::class.java)
+        mapViewModel = ViewModelProvider(requireActivity()).get(MapViewModel::class.java)
+        mapViewModel.getSpeed().observe(viewLifecycleOwner,{
+            speedTxt.text = it.toString()
+            Log.d("Speed MODEL", it.toString())
+        })
+        var sharedViewModel = ViewModelProvider(requireActivity()).get(TablViewModel::class.java)
         jsFirst.setOnMoveListener(JoystickView.OnMoveListener { angle, strength ->
             Log.d("Dpad angle", angle.toString())
 //            val res = degreeToSpeed(angle, strength, safe_degree = 10)

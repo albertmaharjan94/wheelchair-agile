@@ -1,13 +1,26 @@
-package com.softwarica.wheelchairapp.ui.main.Dash
+package com.softwarica.wheelchairapp
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.softwarica.wheelchairapp.network.model.User
+import kotlinx.coroutines.launch
 
 
-class ModelViewModel: ViewModel() {
+class TablViewModel: ViewModel() {
     private var stringSerialData: MutableLiveData<List<String>>? = MutableLiveData(listOf("0", "0", "0", "0"))
+
+    private  var speed: MutableLiveData<Int> = MutableLiveData(0);
+    fun setSpeed(s: Int){
+        speed.postValue(s)
+    }
+    fun getSpeed(): MutableLiveData<Int> {
+        return speed
+    }
+
+
     fun init() {
         stringSerialData = MutableLiveData(listOf("0", "0", "0", "0"))
     }
@@ -15,6 +28,8 @@ class ModelViewModel: ViewModel() {
     fun sendSerialData(msg: List<String>) {
         stringSerialData!!.postValue(msg)
     }
+
+
 
     fun getSerialData(): LiveData<List<String>>? {
         return stringSerialData

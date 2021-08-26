@@ -32,7 +32,6 @@ import com.softwarica.wheelchairapp.network.model.StartActivity
 import com.softwarica.wheelchairapp.network.model.StartTime
 import com.softwarica.wheelchairapp.network.repository.ActivityRespository
 import com.softwarica.wheelchairapp.services.UsbService
-import com.softwarica.wheelchairapp.ui.main.Dash.ModelViewModel
 import com.softwarica.wheelchairapp.ui.main.SectionsPagerAdapter
 import io.ghyeok.stickyswitch.widget.StickySwitch
 import kotlinx.coroutines.CoroutineScope
@@ -59,7 +58,7 @@ class TabActivity : AppCompatActivity() {
     private lateinit var conntxt: TextView
     private lateinit var txtDebugger: TextView
     private var bt_status = false
-    private var modelViewModel: ModelViewModel? = null
+    private var tablViewModel: TablViewModel? = null
     private var relativeLayout: RelativeLayout? = null
     var mode: String? = null
     var progress: ProgressDialog? = null
@@ -353,8 +352,8 @@ class TabActivity : AppCompatActivity() {
 
         view_pager?.adapter = sectionsPagerAdapter
 
-        modelViewModel = ViewModelProvider(this).get(ModelViewModel::class.java)
-        modelViewModel!!.init()
+        tablViewModel = ViewModelProvider(this).get(TablViewModel::class.java)
+        tablViewModel!!.init()
 
         var tabs: TabLayout = findViewById(R.id.tabs)
 
@@ -372,7 +371,7 @@ class TabActivity : AppCompatActivity() {
         connectLay = findViewById(R.id.connectLay)
         btnChangeMode = findViewById(R.id.btnChangeMode)
         imageTextToggleSwitch = findViewById(R.id.imageTextToggleSwitch)
-        modelViewModel!!.getReverse().observe(this, { data ->
+        tablViewModel!!.getReverse().observe(this, { data ->
             if(data == true){
                 forward.visibility = View.VISIBLE; reverse.visibility = View.GONE;
             }else{
@@ -814,7 +813,7 @@ class TabActivity : AppCompatActivity() {
                     val stats =
                         "${buffer[1].trim()} ${buffer[2].trim()} ${buffer[3].trim()} ${buffer[4].trim()}"
                     activity.txtDebugger.text = stats
-                    activity.modelViewModel!!.sendSerialData(buffer)
+                    activity.tablViewModel!!.sendSerialData(buffer)
                 }
             }
         }

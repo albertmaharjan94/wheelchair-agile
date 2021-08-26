@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.PendingIntent
-import android.app.ProgressDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -14,7 +13,6 @@ import android.content.pm.PackageManager
 import android.location.*
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
 import android.telephony.SmsManager
 import android.util.Log
 import android.view.LayoutInflater
@@ -25,6 +23,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.*
@@ -33,6 +32,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.softwarica.wheelchairapp.R
+import com.softwarica.wheelchairapp.TablViewModel
 import com.softwarica.wheelchairapp.network.api.ServiceBuilder
 import com.softwarica.wheelchairapp.network.database_conf.WheelDB
 import com.softwarica.wheelchairapp.network.model.Coordinates
@@ -46,7 +46,6 @@ import java.io.IOException
 import java.util.*
 
 
-
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class MapsFragment : Fragment() {
     var locationManager: LocationManager? = null
@@ -55,7 +54,7 @@ class MapsFragment : Fragment() {
     var changeLoc : Boolean ?= true
     var checkHandler : Boolean ?= true
     var locationListener: LocationListener = MyLocationListener()
-
+    lateinit var mapViewModel: MapViewModel
     var mCurrLocationMarker: Marker? = null
     var mapView: MapView? = null
     var markerName: Marker? = null
@@ -67,6 +66,16 @@ class MapsFragment : Fragment() {
     private var googleMap: GoogleMap? = null
 
 
+    private var tablViewModel: TablViewModel? = null
+
+    var time = System.currentTimeMillis()
+    var current = time
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        mapViewModel = ViewModelProvider(this).get(MapViewModel::class.java)
+
+    }
     @SuppressLint("MissingPermission")
     private val callback = OnMapReadyCallback { mMap ->
         /**
@@ -141,6 +150,9 @@ class MapsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requestMapPermission()
+
+
+        tablViewModel = ViewModelProvider(this).get(TablViewModel::class.java)
 
         btnEmergency = view.findViewById(R.id.btnEmergency)
         mapView = view.findViewById(R.id.mapView) as MapView
@@ -234,7 +246,7 @@ class MapsFragment : Fragment() {
 
         try {
             locationManager!!.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER, 1000, 5F, locationListener
+                LocationManager.GPS_PROVIDER, 1000, 0F, locationListener
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -263,29 +275,34 @@ class MapsFragment : Fragment() {
     }
 
     private inner class MyLocationListener : LocationListener {
-        @SuppressLint("MissingPermission")
         override fun onLocationChanged(loc: Location) {
             // tracker function here
-
-            current_address = getLocationAddress(loc)
-            val coordinates = arrayOf<Double>(
-                loc.latitude, loc.longitude
-            )
+            time = System.currentTimeMillis()
+            if(time > current + 1*1000*60){
+                current_address = getLocationAddress(loc)
+                val coordinates = arrayOf<Double>(
+                    loc.latitude, loc.longitude
+                )
 //            Toast.makeText(context, "location.........", Toast.LENGTH_SHORT).show()
-            Log.d("CheckHandler", checkHandler.toString())
-            Log.d("ChangeLoc", changeLoc.toString())
-            if(changeLoc!!){
-                if(checkHandler!!){
-                    tracker(coordinates)
-                    changeLoc = false
-                    checkHandler = false
-                    Handler().postDelayed({
-                        changeLoc = true
-                        checkHandler = true
-                    }, 8000)
+                Log.d("CheckHandler", checkHandler.toString())
+                Log.d("ChangeLoc", changeLoc.toString())
+                if(changeLoc!!){
+                    if(checkHandler!!){
+                        tracker(coordinates)
+                        changeLoc = false
+                        checkHandler = false
+                        Handler().postDelayed({
+                            changeLoc = true
+                            checkHandler = true
+                        }, 8000)
+                    }
                 }
+                current = time
             }
 
+            val speed = loc.speed
+            mapViewModel.setSpeed(speed.toString())
+            Log.d("Speed Set Map", speed.toString())
             mapView!!.getMapAsync(callback)
 
         }

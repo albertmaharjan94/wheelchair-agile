@@ -14,7 +14,7 @@ import com.softwarica.wheelchairapp.ui.main.User.AccountsFragment
 private val TAB_TITLES = arrayOf(
     R.string.tab_text_1,
     R.string.tab_text_3,
-    R.string.tab_text_2,
+//    R.string.tab_text_2,
     R.string.tab_text_4
 )
 
@@ -31,7 +31,7 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager, va
         when(position){
             0 -> return ModelFragment.newInstance(position + 1, mode)
             1 -> return MapsFragment.newInstance(position + 1)
-            2 -> return PlaceholderFragment.newInstance(position + 1)
+//            2 -> return PlaceholderFragment.newInstance(position + 1)
             3 -> return AccountsFragment.newInstance(position + 1)
             else -> {
 
@@ -46,6 +46,6 @@ class SectionsPagerAdapter(private val context: Context, fm: FragmentManager, va
 
     override fun getCount(): Int {
         // Show 2 total pages.
-        return 4
+        return 3
     }
 }
