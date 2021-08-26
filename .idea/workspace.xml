@@ -4,20 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ee806ec1-6d32-45e5-82cf-6e696221d80d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/BaseClass.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/api/ConnectivityReceiver.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/ui/main/Auth/LoginViewModelFactory.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/dao/AuthDao.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/dao/AuthDao.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/database_conf/WheelDB.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/database_conf/WheelDB.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/model/StartTimeConverter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/model/StartTimeConverter.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/model/TrackerTypeConverter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/model/TrackerTypeConverter.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/model/User.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/model/User.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/repository/UserRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/network/repository/UserRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/ui/main/Auth/LoginActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/ui/main/Auth/LoginActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/ui/main/Auth/LoginViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/ui/main/Auth/LoginViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/ui/main/Stats/PageViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Android/Wheelchair/app/src/main/java/com/softwarica/wheelchairapp/ui/main/Stats/PageViewModel.kt" afterDir="false" />
-    </list>
+    <list default="true" id="ee806ec1-6d32-45e5-82cf-6e696221d80d" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -47,9 +34,10 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="463" y="138" key="FileChooserDialogImpl" timestamp="1625112813097">
-      <screen x="0" y="0" width="1366" height="768" />
+    <state x="651" y="216" width="424" height="491" key="FileChooserDialogImpl" timestamp="1626327163633">
+      <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="463" y="138" key="FileChooserDialogImpl/0.0.1366.768@0.0.1366.768" timestamp="1625112813097" />
+    <state x="651" y="216" width="424" height="491" key="FileChooserDialogImpl/0.27.1920.1053@0.27.1920.1053" timestamp="1626327163633" />
   </component>
 </project>
