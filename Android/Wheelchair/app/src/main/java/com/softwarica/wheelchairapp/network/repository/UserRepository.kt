@@ -23,23 +23,34 @@ class UserRepository(private val authDao: AuthDao) : VehicleAPIRequest() {
 
     //Login user
     suspend fun checkUser(email: String, password: String): User? {
+        var res: UserResponse? = null
         var data = try {
             val response = apiRequest {
                 authAPI.loginUser(email, password)
             }
+            res = response
             response.data
-        }
-        catch (ex: Exception){
+        } catch (ex: Exception) {
             ex.printStackTrace()
+            res = null
             null
         }
 
         try {
-            if (data == null) data = authDao.checkAuth(email, password)
-            ServiceBuilder.logged_user = data
-            ServiceBuilder.token = data.token
-        }
-        catch (ex: Exception){
+            if (data == null && res == null) {
+                val dat :User? = authDao.checkAuth(email, password)
+                data = dat
+                if (dat == null) {
+                    ServiceBuilder.token = "-1"
+                } else {
+                    ServiceBuilder.logged_user = data
+                    ServiceBuilder.token = data?.token
+                }
+            } else {
+                ServiceBuilder.logged_user = data
+                ServiceBuilder.token = data?.token
+            }
+        } catch (ex: Exception) {
             ex.printStackTrace()
             ServiceBuilder.token = "-1"
         }
@@ -55,12 +66,11 @@ class UserRepository(private val authDao: AuthDao) : VehicleAPIRequest() {
                 authAPI.getProfile(ServiceBuilder.token!!)
             }
             response.data
-        }
-        catch (ex: Exception){
+        } catch (ex: Exception) {
             null
         }
 
-        if(data != null){
+        if (data != null) {
             data.password = password
             data.token = ServiceBuilder.token
             ServiceBuilder.logged_user = data

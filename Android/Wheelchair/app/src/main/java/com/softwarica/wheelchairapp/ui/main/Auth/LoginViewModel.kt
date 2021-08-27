@@ -16,8 +16,8 @@ class LoginViewModel(private val authDao: AuthDao) : ViewModel() {
         get() = _user
 
     fun checkUser(email: String, password: String) {
-//         viewModelScope.launch {
-//            _user.value = userRepository.checkUser(email, password)
-//        }
+         viewModelScope.launch {
+            _user.value = userRepository.checkUser(email, password)
+        }
     }
 }
