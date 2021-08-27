@@ -14,7 +14,7 @@ interface AuthAPI {
         @Field("password") password: String
     ): Response<UserResponse>
 
-    @GET("auth/profile")
+    @GET("auth/get/profile")
     suspend fun getProfile(
         @Header("Authorization") token:String,
     ): Response<UserResponse>

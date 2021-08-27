@@ -9,7 +9,7 @@ import com.softwarica.wheelchairapp.network.model.StartTime
 import com.softwarica.wheelchairapp.network.response.ActivityResponse
 
 
-class ActivityRespository : VehicleAPIRequest() {
+class  ActivityRespository : VehicleAPIRequest() {
     private val activityAPI = ServiceBuilder.buildService(ActivityAPI::class.java)
 
     //Add Activity
