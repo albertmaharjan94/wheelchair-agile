@@ -106,7 +106,7 @@ class ModelFragment : Fragment(), Node.OnTouchListener  {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-                val view = inflater.inflate(R.layout.fragment_model, container, false)
+        val view = inflater.inflate(R.layout.fragment_model, container, false)
         sceneView = view.findViewById(R.id.sceneView)
         scene = sceneView.scene
 

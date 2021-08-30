@@ -187,7 +187,8 @@ class TabActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        mode = intent.getStringExtra(Constants.MODE)!!
+//        mode = intent.getStringExtra(Constants.MODE)!!
+        mode = "dock"
         bt_status = intent.getBooleanExtra(Constants.BT_STATUS, false)
         if (mode == Constants.DOCK) {
             setFilters() // Start listening notifications from UsbService
@@ -231,7 +232,8 @@ class TabActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         setContentView(R.layout.activity_tab)
-        mode = intent.getStringExtra(Constants.MODE)
+//        mode = intent.getStringExtra(Constants.MODE)
+        mode = "dock"
         bt_status = intent.getBooleanExtra(Constants.BT_STATUS, false)
         progress = ProgressDialog(this@TabActivity)
         progress?.setCancelable(false)

@@ -62,7 +62,10 @@
                 android:name=".TabActivity"
                 android:label="@string/title_activity_tab"
                 android:configChanges="orientation|keyboardHidden|screenSize"
-                android:theme="@style/Theme.WheelchairApp.NoActionBar"></activity>
+                android:theme="@style/Theme.WheelchairApp.NoActionBar">
+
+        </activity>
+
         <activity android:name=".MainActivity" />
 
         <service
