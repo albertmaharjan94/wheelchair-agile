@@ -24,10 +24,11 @@ class LoginTesting {
 
     @Test
     fun checkLogin() {
-
         onView(withId(R.id.usernametxt))
             .perform(ViewActions.typeText("raj@gmail.com"))
         Thread.sleep(1000)
+
+        closeSoftKeyboard()
 
         onView(withId(R.id.passwordtxt))
             .perform(ViewActions.typeText("1234567890"))
